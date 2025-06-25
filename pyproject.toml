@@ -1,0 +1,26 @@
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+authors = [
+    {name = "René Schwaiger", email = "rene.schwaiger@ift.at"},
+]
+
+dependencies = [
+  "icotronic>=3",
+]
+description = """Stateful API for the ICOtronic system intended for usage in
+              a Web API"""
+keywords = [
+    "smart-tool",
+    "smh",
+    "stu",
+    "sth",
+    "tool-holder",
+]
+name = "icostate"
+readme = "ReadMe.md"
+requires-python = ">=3.10,<4"
+version = "0.1"
+

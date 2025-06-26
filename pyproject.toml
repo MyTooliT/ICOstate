@@ -27,7 +27,8 @@ version = "0.1"
 [project.optional-dependencies]
 dev = [
   "black>=25.1.0",
-  "Flake8-pyproject>=1.2.3"
+  "Flake8-pyproject>=1.2.3",
+  "mypy>=1.16.1",
 ]
 
 [tool.black]
@@ -47,3 +48,6 @@ ignore = [
   # Line break after binary operator
   "W504"
 ]
+
+[tool.mypy]
+ignore_missing_imports = true

@@ -10,7 +10,7 @@ authors = [
 dependencies = [
   "icotronic>=3,<4",
 ]
-description = """Stateful API for the ICOtronic system intended for usage in
+description = """Stateful API for the ICOtronic system intended for usage in \
               a Web API"""
 keywords = [
     "smart-tool",

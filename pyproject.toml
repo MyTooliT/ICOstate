@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 authors = [
-    {name = "René Schwaiger", email = "rene.schwaiger@ift.at"},
+  {name = "René Schwaiger", email = "rene.schwaiger@ift.at"},
 ]
 
 dependencies = [
@@ -13,11 +13,11 @@ dependencies = [
 description = """Stateful API for the ICOtronic system intended for usage in \
               a Web API"""
 keywords = [
-    "smart-tool",
-    "smh",
-    "stu",
-    "sth",
-    "tool-holder",
+  "smart-tool",
+  "smh",
+  "stu",
+  "sth",
+  "tool-holder",
 ]
 name = "icostate"
 readme = "ReadMe.md"
@@ -32,7 +32,7 @@ dev = [
   "pylint>=3.3.7"
 ]
 test = [
-    "pytest>=8.4.1"
+  "pytest>=8.4.1"
 ]
 
 [tool.black]

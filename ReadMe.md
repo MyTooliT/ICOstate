@@ -33,30 +33,30 @@ make check
 
 ## Release
 
-To release a new version of this package on [PyPI](https://pypi.org/project/icostate/):
+**Note:** In the text below we assume that you want to release version `0.2` of the package. Please just replace this version number with the version that you want to release.
 
-1. Increase the version number e.g. for version `0.2`:
+1. Make sure that all the checks and tests work correctly
+
+   ```sh
+   make
+   ```
+
+2. Release a new version on [PyPI](https://pypi.org/project/icostate/):
+   1. Increase version number
+   2. Add git tag containing version number
+   3. Push changes
 
    ```sh
    poetry version 0.2
-   ```
-
-   and commit your changes:
-
-   ```sh
    export icostate_version="$(poetry version -s)"
    git commit -a -m "Release: Release version $icostate_version"
-   ```
-
-2. Add a tag with the version number to the latest commit:
-
-   ```sh
-   export icostate_version="$(poetry version -s)"
    git tag "$icostate_version"
-   ```
-
-3. Push the latest updates including the new tag:
-
-   ```sh
    git push && git push --tags
    ```
+
+3. Open the [release notes](doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)
+   1. Copy the release notes
+   2. Paste them into the main text of the release web page
+   3. Insert the version number (e.g. `0.2`) into the tag field
+   4. For the release title use “Version VERSION”, where `VERSION` specifies the version number (e.g. “Version 0.2”)
+   5. Click on “Publish Release”

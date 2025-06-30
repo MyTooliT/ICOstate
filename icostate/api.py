@@ -9,7 +9,7 @@ from icotronic.can import Connection
 # -- Classes ------------------------------------------------------------------
 
 
-class ICOSystem:
+class ICOsystem:
     """Stateful access to ICOtronic system"""
 
     def __init__(self):

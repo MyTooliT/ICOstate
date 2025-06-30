@@ -1,3 +1,7 @@
+# -- Variables -----------------------------------------------------------------
+
+PACKAGE = icostate
+
 # -- Rules ---------------------------------------------------------------------
 
 .PHONY: all
@@ -12,3 +16,7 @@ check:
 .PHONY: test
 test:
 	pytest .
+
+.PHONY: test-no-hardware
+test-no-hardware:
+	pytest --ignore '$(PACKAGE)/system.py'

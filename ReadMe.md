@@ -12,22 +12,18 @@ in the text below.
 # Install
 
 ```sh
-poetry install
-```
-
-To also add development dependencies you can use the following command:
-
-```sh
-poetry install --extras dev
-```
-
-To install all extras use:
-
-```sh
-poetry install --all-extras
+pip install icostate
 ```
 
 # Development
+
+## Install
+
+For development we recommend you clone the repository and install the package with poetry:
+
+```sh
+poetry lock && poetry install --all-extras
+```
 
 ## Check
 

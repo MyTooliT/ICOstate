@@ -42,9 +42,11 @@ class ICOsystem:
 
         """
 
-        # pylint: disable=unnecessary-dunder-call
-        self.stu = await self.connection.__aenter__()
-        # pylint: enable=unnecessary-dunder-call
+        # Do not try to connect a second time, if already connected
+        if self.stu is not None:
+            # pylint: disable=unnecessary-dunder-call
+            self.stu = await self.connection.__aenter__()
+            # pylint: enable=unnecessary-dunder-call
         self.state = State.STU_CONNECTED
 
     async def disconnect_stu(self):

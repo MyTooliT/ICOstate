@@ -56,7 +56,7 @@ ignore = [
   # Line break after binary operator
   "W504"
 ]
-per-file-ignores = "__init__.py:F401"
+per-file-ignores = "__init__.py:F401,conf.py:F821"
 
 [tool.mypy]
 ignore_missing_imports = true

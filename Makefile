@@ -2,7 +2,7 @@
 
 PACKAGE = icostate
 SPHINX_DIRECTORY := sphinx
-SPHINX_INPUT_DIRECTORY := doc
+SPHINX_INPUT_DIRECTORY := doc/sphinx
 
 # -- Rules ---------------------------------------------------------------------
 

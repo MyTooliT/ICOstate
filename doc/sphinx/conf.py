@@ -11,7 +11,7 @@ from sphinx_pyproject import SphinxConfig
 
 # -- Project information ------------------------------------------------------
 
-config = SphinxConfig("../pyproject.toml", globalns=globals())
+config = SphinxConfig("../../pyproject.toml", globalns=globals())
 # pylint: disable=redefined-builtin
 copyright = f"{datetime.now().year}, {author}"
 project = name

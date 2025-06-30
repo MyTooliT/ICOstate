@@ -1,3 +1,5 @@
+[![API Documentation](https://img.shields.io/readthedocs/icostate?label=Documentation)](https://icostate.readthedocs.io/en/stable/)
+
 # Requirements
 
 - [Python 3](https://www.python.org)

@@ -49,7 +49,7 @@ make check
    ```
 
 5. Open the [release notes](https://github.com/MyTooliT/ICOstate/tree/main/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)
-   1. Copy the release notes
+   1. Copy the release notes (without the first section header)
    2. Paste them into the main text of the release web page
    3. Insert the version number (e.g. `0.2`) into the tag field
    4. For the release title use “Version VERSION”, where `VERSION` specifies the version number (e.g. “Version 0.2”)

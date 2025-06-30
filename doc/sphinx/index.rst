@@ -14,4 +14,5 @@ The ICOstate package contains a stateful application interface for the `ICOtroni
    :maxdepth: 2
    :caption: Contents:
 
+   state
    api

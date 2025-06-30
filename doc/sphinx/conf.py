@@ -23,6 +23,8 @@ project = name  # type: ignore[name-defined]
 # -- General configuration ----------------------------------------------------
 
 extensions = [
+    "myst_parser",
+    "sphinxcontrib.mermaid",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",

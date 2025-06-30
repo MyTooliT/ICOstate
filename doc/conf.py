@@ -36,4 +36,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autoclass_content = "both"
 autodoc_inherit_docstrings = False
 
+# -- HTML Theme ---------------------------------------------------------------
+
+html_theme = "furo"
+
 # pylint: enable=invalid-name

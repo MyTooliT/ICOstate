@@ -1,0 +1,4 @@
+furo>=2024.8.6
+sphinx-autodoc-typehints>=3
+sphinx-pyproject>=0.3
+sphinx_toggleprompt>=0.6.0

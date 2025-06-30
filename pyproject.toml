@@ -29,7 +29,10 @@ dev = [
   "black>=25.1.0",
   "Flake8-pyproject>=1.2.3",
   "mypy>=1.16.1",
-  "pylint>=3.3.7"
+  "pylint>=3.3.7",
+  "sphinx-autodoc-typehints>=3",
+  "sphinx-pyproject>=0.3",
+  "sphinx_toggleprompt>=0.6.0",
 ]
 test = [
   "pytest>=8.4.1"

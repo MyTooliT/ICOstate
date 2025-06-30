@@ -27,13 +27,15 @@ make check
 
 1. Make sure all [workflows of the CI system work correctly](https://github.com/MyTooliT/ICOstate/actions)
 
-2. Make sure that all the checks and tests work correctly locally
+2. Check that the most recent [“Read the Docs” build of the documentation ran successfully](https://app.readthedocs.org/projects/icostate/)
+
+3. Make sure that all the checks and tests work correctly locally
 
    ```sh
    make
    ```
 
-3. Release a new version on [PyPI](https://pypi.org/project/icostate/):
+4. Release a new version on [PyPI](https://pypi.org/project/icostate/):
    1. Increase version number
    2. Add git tag containing version number
    3. Push changes
@@ -46,7 +48,7 @@ make check
    git push && git push --tags
    ```
 
-4. Open the [release notes](https://github.com/MyTooliT/ICOstate/tree/main/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)
+5. Open the [release notes](https://github.com/MyTooliT/ICOstate/tree/main/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)
    1. Copy the release notes
    2. Paste them into the main text of the release web page
    3. Insert the version number (e.g. `0.2`) into the tag field

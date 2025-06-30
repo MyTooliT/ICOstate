@@ -31,6 +31,9 @@ dev = [
   "mypy>=1.16.1",
   "pylint>=3.3.7"
 ]
+test = [
+    "pytest>=8.4.1"
+]
 
 [tool.black]
 line-length = 79
@@ -52,3 +55,10 @@ ignore = [
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# - Use doctests
+# - Fail after first errors
+# - Verbose output
+addopts = "--doctest-modules -x -v"
+minversion = "6.0"

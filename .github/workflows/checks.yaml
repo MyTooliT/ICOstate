@@ -33,8 +33,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dev packages
-      run: pip install -e .[dev]
+    - name: Install dev and test packages
+      run: pip install -e .[dev,test]
 
     - name: Check code base
       run: make check
+
+    - name: Test code
+      run: make test

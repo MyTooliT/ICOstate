@@ -11,19 +11,20 @@ all: check test
 
 .PHONY: check
 check:
-	flake8
-	mypy .
-	pylint .
+	poetry run flake8
+	poetry run mypy .
+	poetry run pylint .
 
 .PHONY: test
 test:
-	pytest .
+	poetry run pytest .
 
 .PHONY: test-no-hardware
 test-no-hardware:
-	pytest --ignore '$(PACKAGE)/system.py'
+	poetry run pytest --ignore '$(PACKAGE)/system.py'
 
 .PHONY: documentation
 documentation:
 	poetry run sphinx-apidoc -f -o $(SPHINX_DIRECTORY) $(SPHINX_INPUT_DIRECTORY)
-	poetry run sphinx-build -M html $(SPHINX_INPUT_DIRECTORY) $(SPHINX_DIRECTORY)
+	poetry run sphinx-build -M html $(SPHINX_INPUT_DIRECTORY) \
+	    $(SPHINX_DIRECTORY)

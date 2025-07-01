@@ -72,6 +72,8 @@ class ICOsystem:
 
         """
 
+        self._check_state({State.DISCONNECTED}, "Connecting to STU")
+
         # Do not try to connect a second time, if already connected
         if self.stu is None:
             # pylint: disable=unnecessary-dunder-call
@@ -82,6 +84,8 @@ class ICOsystem:
 
     async def disconnect_stu(self) -> None:
         """Disconnect from STU"""
+
+        self._check_state({State.STU_CONNECTED}, "Disconnecting from STU")
 
         await self.connection.__aexit__(None, None, None)
         self.state = State.DISCONNECTED

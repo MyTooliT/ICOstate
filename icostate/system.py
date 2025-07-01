@@ -31,12 +31,12 @@ class ICOsystem:
 
             Connect and disconnect from STU
 
-            >>> async def connect_disconnect_stu(icotronic: ICOsystem):
-            ...     states = [icotronic.state]
-            ...     await icotronic.connect_stu()
-            ...     states.append(icotronic.state)
-            ...     await icotronic.disconnect_stu()
-            ...     states.append(icotronic.state)
+            >>> async def connect_disconnect_stu(icosystem: ICOsystem):
+            ...     states = [icosystem.state]
+            ...     await icosystem.connect_stu()
+            ...     states.append(icosystem.state)
+            ...     await icosystem.disconnect_stu()
+            ...     states.append(icosystem.state)
             ...     return states
             >>> run(connect_disconnect_stu(ICOsystem()))
             [Disconnected, STU Connected, Disconnected]

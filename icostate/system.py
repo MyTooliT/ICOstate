@@ -6,7 +6,7 @@
 
 from asyncio import sleep
 
-from icotronic.can import Connection, STU
+from icotronic.can import Connection, NoResponseError, STU
 from icotronic.can.status import State as NodeState
 
 from icostate.error import IncorrectStateError
@@ -49,8 +49,13 @@ class ICOsystem:
                 f"{', '.join(map(repr, states))}"
             )
 
-    async def connect_stu(self) -> None:
+    async def connect_stu(self) -> bool:
         """Connect to STU
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
 
         Examples:
 
@@ -74,23 +79,43 @@ class ICOsystem:
 
         self._check_state({State.DISCONNECTED}, "Connecting to STU")
 
-        # pylint: disable=unnecessary-dunder-call
-        self.stu = await self.connection.__aenter__()
-        # pylint: enable=unnecessary-dunder-call
-        self.state = State.STU_CONNECTED
-        assert isinstance(self.stu, STU)
+        try:
+            # pylint: disable=unnecessary-dunder-call
+            self.stu = await self.connection.__aenter__()
+            # pylint: enable=unnecessary-dunder-call
+            self.state = State.STU_CONNECTED
+            assert isinstance(self.stu, STU)
+            return True
+        except NoResponseError:
+            return False
 
-    async def disconnect_stu(self) -> None:
-        """Disconnect from STU"""
+    async def disconnect_stu(self) -> bool:
+        """Disconnect from STU
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
+
+        """
 
         self._check_state({State.STU_CONNECTED}, "Disconnecting from STU")
 
-        await self.connection.__aexit__(None, None, None)
-        self.state = State.DISCONNECTED
-        self.stu = None
+        try:
+            await self.connection.__aexit__(None, None, None)
+            self.state = State.DISCONNECTED
+            self.stu = None
+            return True
+        except NoResponseError:
+            return False
 
-    async def reset_stu(self) -> None:
+    async def reset_stu(self) -> bool:
         """Reset STU
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
 
         Examples:
 
@@ -123,17 +148,22 @@ class ICOsystem:
 
         assert isinstance(self.stu, STU)
 
-        await self.stu.reset()
+        try:
 
-        # Make sure that the STU is in the correct state after the reset,
-        # although this seems to be the case anyway. At least in my limited
-        # tests the STU was always in the “operating state” even directly
-        # after the reset.
-        operating = NodeState(location="Application", state="Operating")
-        while (state := await self.stu.get_state()) != operating:
-            await sleep(1)
+            await self.stu.reset()
+
+            # Make sure that the STU is in the correct state after the reset,
+            # although this seems to be the case anyway. At least in my limited
+            # tests the STU was always in the “operating state” even directly
+            # after the reset.
+            operating = NodeState(location="Application", state="Operating")
+            while (state := await self.stu.get_state()) != operating:
+                await sleep(1)
+        except NoResponseError:
+            return False
 
         assert state == operating
+        return True
 
 
 if __name__ == "__main__":

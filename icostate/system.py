@@ -4,8 +4,9 @@
 
 # -- Imports ------------------------------------------------------------------
 
-from icotronic.can import Connection
+from icotronic.can import Connection, STU
 
+from icostate.error import IncorrectStateError
 from icostate.state import State
 
 # -- Classes ------------------------------------------------------------------
@@ -17,9 +18,9 @@ class ICOsystem:
     def __init__(self):
         self.state = State.DISCONNECTED
         self.connection = Connection()
-        self.stu = None
+        self.stu: STU | None = None
 
-    async def connect_stu(self):
+    async def connect_stu(self) -> None:
         """Connect to STU
 
         Examples:
@@ -50,7 +51,7 @@ class ICOsystem:
         self.state = State.STU_CONNECTED
         assert isinstance(self.stu, STU)
 
-    async def disconnect_stu(self):
+    async def disconnect_stu(self) -> None:
         """Disconnect from STU"""
 
         await self.connection.__aexit__(None, None, None)

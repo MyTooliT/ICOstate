@@ -1,3 +1,4 @@
+icostate @ git+https://github.com/MyTooliT/ICOstate@main
 furo>=2024.8.6
 myst-parser>=4.0.1
 sphinxcontrib-mermaid>=1.0.0

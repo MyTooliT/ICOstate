@@ -41,7 +41,7 @@ make check
    3. Push changes
 
    ```sh
-   poetry version 0.2
+   poetry version <VERSION>
    export icostate_version="$(poetry version -s)"
    git commit -a -m "Release: Release version $icostate_version"
    git tag "$icostate_version"

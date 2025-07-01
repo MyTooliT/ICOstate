@@ -23,6 +23,32 @@ class ICOsystem:
         self.connection = Connection()
         self.stu: STU | None = None
 
+    def _check_state(self, states: set[State], description: str) -> None:
+        """Check if the system is in an allowed state
+
+        Args:
+
+            states:
+                The set of allowed states
+
+            description:
+                A description of the action that is only allowed in the states
+                specified by ``states``
+
+        Raises:
+
+            IncorrectStateError:
+                If the current state is not included in ``states``
+
+        """
+
+        if self.state not in states:
+            plural = "" if len(states) <= 1 else "s"
+            raise IncorrectStateError(
+                f"{description} only allowed in the state{plural}: "
+                f"{', '.join(map(repr, states))}"
+            )
+
     async def connect_stu(self) -> None:
         """Connect to STU
 
@@ -91,13 +117,7 @@ class ICOsystem:
 
         """
 
-        allowed_states = {State.STU_CONNECTED}
-
-        if self.state not in allowed_states:
-            raise IncorrectStateError(
-                "Resetting STU only allowed in the state: "
-                f"{', '.join(map(repr, allowed_states))}"
-            )
+        self._check_state({State.STU_CONNECTED}, "Resetting STU")
 
         assert isinstance(self.stu, STU)
 

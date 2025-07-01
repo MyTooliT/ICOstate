@@ -13,9 +13,9 @@ State Diagram
        stu_connected: STU Connected
        disconnected: Disconnected
 
-       disconnected --> stu_connected: stu_connect
+       disconnected --> stu_connected: connect_stu
        stu_connected --> disconnected: disconnect_stu
-       stu_connected --> stu_connected: reset, stu_connect
+       stu_connected --> stu_connected: reset
 
 System
 ######

@@ -74,11 +74,9 @@ class ICOsystem:
 
         self._check_state({State.DISCONNECTED}, "Connecting to STU")
 
-        # Do not try to connect a second time, if already connected
-        if self.stu is None:
-            # pylint: disable=unnecessary-dunder-call
-            self.stu = await self.connection.__aenter__()
-            # pylint: enable=unnecessary-dunder-call
+        # pylint: disable=unnecessary-dunder-call
+        self.stu = await self.connection.__aenter__()
+        # pylint: enable=unnecessary-dunder-call
         self.state = State.STU_CONNECTED
         assert isinstance(self.stu, STU)
 

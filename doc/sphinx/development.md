@@ -55,3 +55,11 @@ make check
    4. Insert the version number (e.g. `0.2`) into the tag field
    5. For the release title use “Version VERSION”, where `VERSION` specifies the version number (e.g. “Version 0.2”)
    6. Click on “Publish Release”
+
+   **Note:** Alternatively you can also use the [`gh`](https://cli.github.com) command:
+
+   ```sh
+   gh release create
+   ```
+
+   to create the release notes.

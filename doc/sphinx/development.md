@@ -23,7 +23,7 @@ make check
 
 ## Release
 
-**Note:** In the text below we assume that you want to release version `0.2` of the package. Please just replace this version number with the version that you want to release.
+**Note:** In the text below we assume that you want to release version `<VERSION>` of the package. Please just replace this version number with the version that you want to release (e.g. `0.2`).
 
 1. Make sure that all the checks and tests work correctly locally
 
@@ -52,8 +52,8 @@ make check
    1. Copy the release notes (without the first section header)
    2. Paste them into the main text of the release web page
    3. Decrease every header level of the pasted release notes by one
-   4. Insert the version number (e.g. `0.2`) into the tag field
-   5. For the release title use “Version VERSION”, where `VERSION` specifies the version number (e.g. “Version 0.2”)
+   4. Insert the version number into the tag field
+   5. For the release title use “Version <VERSION>”, where `<VERSION>` specifies the version number (e.g. “Version 0.2”)
    6. Click on “Publish Release”
 
    **Note:** Alternatively you can also use the [`gh`](https://cli.github.com) command:

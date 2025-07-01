@@ -25,15 +25,15 @@ make check
 
 **Note:** In the text below we assume that you want to release version `0.2` of the package. Please just replace this version number with the version that you want to release.
 
-1. Make sure all [workflows of the CI system work correctly](https://github.com/MyTooliT/ICOstate/actions)
-
-2. Check that the most recent [“Read the Docs” build of the documentation ran successfully](https://app.readthedocs.org/projects/icostate/)
-
-3. Make sure that all the checks and tests work correctly locally
+1. Make sure that all the checks and tests work correctly locally
 
    ```sh
    make
    ```
+
+2. Make sure all [workflows of the CI system work correctly](https://github.com/MyTooliT/ICOstate/actions)
+
+3. Check that the most recent [“Read the Docs” build of the documentation ran successfully](https://app.readthedocs.org/projects/icostate/)
 
 4. Release a new version on [PyPI](https://pypi.org/project/icostate/):
    1. Increase version number

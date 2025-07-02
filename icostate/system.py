@@ -165,6 +165,46 @@ class ICOsystem:
         assert state == operating
         return True
 
+    async def enable_ota(self) -> bool:
+        """Enable OTA (Over The Air) update mode
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Enable OTA update mode
+
+            >>> async def enable_ota(icosystem: ICOsystem):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.enable_ota()
+            ...     await icosystem.disconnect_stu()
+            >>> run(enable_ota(ICOsystem()))
+
+        """
+
+        self._check_state({State.STU_CONNECTED}, "Enabling OTA mode")
+
+        assert isinstance(self.stu, STU)
+
+        try:
+            # The coroutine below activates the advertisement required for the
+            # Over The Air (OTA) firmware update. Please take a look at
+            #
+            # - https://github.com/MyTooliT/ICOtronic/blob/aaf9f380bccb0039e31faaefd09b13830d7ebe1c/icotronic/scripts/icon.py#L327-L338
+            #
+            # for more information
+            await self.stu.activate_bluetooth()
+            return True
+        except NoResponseError:
+            return False
+
 
 if __name__ == "__main__":
     from doctest import testmod

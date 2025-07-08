@@ -195,11 +195,7 @@ class ICOsystem:
 
         try:
             # The coroutine below activates the advertisement required for the
-            # Over The Air (OTA) firmware update. Please take a look at
-            #
-            # - https://github.com/MyTooliT/ICOtronic/blob/aaf9f380bccb0039e31faaefd09b13830d7ebe1c/icotronic/scripts/icon.py#L327-L338
-            #
-            # for more information
+            # Over The Air (OTA) firmware update.
             await self.stu.activate_bluetooth()
             return True
         except NoResponseError:

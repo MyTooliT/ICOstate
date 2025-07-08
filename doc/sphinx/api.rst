@@ -15,7 +15,7 @@ State Diagram
 
        disconnected --> stu_connected: connect_stu
        stu_connected --> disconnected: disconnect_stu
-       stu_connected --> stu_connected: enable_ota, reset
+       stu_connected --> stu_connected: enable_ota, collect_sensor_nodes, reset
 
 System
 ######

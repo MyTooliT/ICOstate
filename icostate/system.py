@@ -7,6 +7,7 @@
 from asyncio import sleep
 
 from icotronic.can import Connection, NoResponseError, STU
+from icotronic.can.node.stu import SensorNodeInfo
 from icotronic.can.status import State as NodeState
 
 from icostate.error import IncorrectStateError
@@ -200,6 +201,42 @@ class ICOsystem:
             return True
         except NoResponseError:
             return False
+
+    async def collect_sensor_nodes(self) -> list[SensorNodeInfo]:
+        """Get available sensor nodes
+
+        This coroutine collects sensor node information until either
+
+        - no new sensor node was found or
+        - until the given timeout, if no sensor node was found.
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Collect sensor nodes
+
+            >>> async def collect_sensor_nodes(icosystem: ICOsystem):
+            ...     await icosystem.connect_stu()
+            ...     nodes = await icosystem.collect_sensor_nodes()
+            ...     await icosystem.disconnect_stu()
+            ...     return nodes
+            >>> sensor_nodes = run(collect_sensor_nodes(ICOsystem()))
+            >>> # We assume that at least one sensor node is available
+            >>> len(sensor_nodes) >= 1
+            True
+
+        """
+
+        self._check_state(
+            {State.STU_CONNECTED}, "Collecting data about sensor devices"
+        )
+
+        assert isinstance(self.stu, STU)
+
+        return await self.stu.collect_sensor_nodes()
 
 
 if __name__ == "__main__":

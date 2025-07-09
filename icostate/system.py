@@ -338,6 +338,53 @@ class ICOsystem:
 
         return True
 
+    async def is_sensor_node_connected(self) -> bool:
+        """Check if the STU is connected to a sensor node
+
+        Returns:
+
+            - ``True``, if the STU is connected to a sensor node
+            - ``False``, otherwise
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Check if a sensor node is connected
+
+            >>> async def connect_sensor_node(icosystem: ICOsystem,
+            ...                               mac_address: str):
+            ...     print("Before connection to STU:",
+            ...           await icosystem.is_sensor_node_connected())
+            ...     await icosystem.connect_stu()
+            ...     print("After connection to STU:",
+            ...           await icosystem.is_sensor_node_connected())
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     print("After connection to sensor node:",
+            ...           await icosystem.is_sensor_node_connected())
+            ...     await icosystem.disconnect_sensor_node()
+            ...     print("After disconnection from sensor node:",
+            ...           await icosystem.is_sensor_node_connected())
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> run(connect_sensor_node(ICOsystem(), mac_address))
+            Before connection to STU: False
+            After connection to STU: False
+            After connection to sensor node: True
+            After disconnection from sensor node: False
+
+        """
+
+        if self.state == State.DISCONNECTED:
+            return False
+
+        assert isinstance(self.stu, STU)
+
+        return await self.stu.is_connected()
+
 
 if __name__ == "__main__":
     from doctest import testmod

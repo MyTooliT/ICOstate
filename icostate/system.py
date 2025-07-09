@@ -218,7 +218,8 @@ class ICOsystem:
 
             Collect sensor nodes
 
-            >>> async def collect_sensor_nodes(icosystem: ICOsystem):
+            >>> async def collect_sensor_nodes(icosystem: ICOsystem
+            ...     ) -> list[SensorNodeInfo]:
             ...     await icosystem.connect_stu()
             ...     nodes = await icosystem.collect_sensor_nodes()
             ...     await icosystem.disconnect_stu()

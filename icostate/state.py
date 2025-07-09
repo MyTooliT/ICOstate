@@ -10,8 +10,9 @@ from enum import auto, Enum
 class State(Enum):
     """Contains the various states the ICOtronic system can be in"""
 
-    STU_CONNECTED = auto()
     DISCONNECTED = auto()
+    STU_CONNECTED = auto()
+    SENSOR_NODE_CONNECTED = auto()
 
     def __repr__(self) -> str:
         """Get string representation of state

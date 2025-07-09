@@ -6,8 +6,11 @@
 
 from asyncio import sleep
 
+from netaddr import AddrFormatError, EUI
+
 from icotronic.can import Connection, NoResponseError, STU
-from icotronic.can.node.stu import SensorNodeInfo
+from icotronic.can.node.sensor import SensorNode
+from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
 
 from icostate.error import IncorrectStateError
@@ -23,6 +26,8 @@ class ICOsystem:
         self.state = State.DISCONNECTED
         self.connection = Connection()
         self.stu: STU | None = None
+        self.sensor_node_connection: AsyncSensorNodeManager | None = None
+        self.sensor_node: SensorNode = None
 
     def _check_state(self, states: set[State], description: str) -> None:
         """Check if the system is in an allowed state
@@ -238,6 +243,100 @@ class ICOsystem:
         assert isinstance(self.stu, STU)
 
         return await self.stu.collect_sensor_nodes()
+
+    async def connect_sensor_node_mac(self, mac_address: str) -> bool:
+        """Connect to the node with the specified MAC address
+
+        Args:
+
+            mac_address:
+                The MAC address of the sensor node
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
+
+        Raises:
+
+            ``ArgumentError``, if the specified MAC address is not valid
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Connect to a disconnect from sensor node
+
+            >>> async def connect_sensor_node(icosystem: ICOsystem,
+            ...                               mac_address: str):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     print(icosystem.state)
+            ...     await icosystem.disconnect_sensor_node()
+            ...     print(icosystem.state)
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> run(connect_sensor_node(ICOsystem(), mac_address))
+            State.SENSOR_NODE_CONNECTED
+            State.STU_CONNECTED
+
+        """
+
+        self._check_state({State.STU_CONNECTED}, "Connecting to sensor device")
+
+        assert isinstance(self.stu, STU)
+
+        eui = None
+        try:
+            eui = EUI(mac_address)
+        except AddrFormatError as error:
+            raise ValueError(
+                f"“{mac_address}” is not a valid MAC address: {error}"
+            ) from error
+
+        assert isinstance(eui, EUI)
+
+        try:
+            self.sensor_node_connection = self.stu.connect_sensor_node(eui)
+            # pylint: disable=unnecessary-dunder-call
+            self.sensor_node = await self.sensor_node_connection.__aenter__()
+            # pylint: enable=unnecessary-dunder-call
+        except NoResponseError:
+            return False
+
+        self.state = State.SENSOR_NODE_CONNECTED
+        return True
+
+    async def disconnect_sensor_node(self) -> bool:
+        """Disconnect from current sensor node
+
+        Returns:
+
+            - ``True``, if everything worked as expected or
+            - ``False``, if there was no response from the STU
+
+        """
+
+        self._check_state(
+            {State.SENSOR_NODE_CONNECTED}, "Disconnecting from sensor device"
+        )
+
+        assert isinstance(self.stu, STU)
+        assert isinstance(self.sensor_node, SensorNode)
+        assert isinstance(self.sensor_node_connection, AsyncSensorNodeManager)
+
+        try:
+            await self.sensor_node_connection.__aexit__(None, None, None)
+        except NoResponseError:
+            return False
+
+        self.sensor_node = None
+        self.state = State.STU_CONNECTED
+
+        return True
 
 
 if __name__ == "__main__":

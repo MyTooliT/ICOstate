@@ -8,7 +8,7 @@ from asyncio import sleep
 
 from netaddr import AddrFormatError, EUI
 
-from icotronic.can import Connection, NoResponseError, STU
+from icotronic.can import Connection, STU
 from icotronic.can.node.sensor import SensorNode
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
@@ -44,6 +44,7 @@ class ICOsystem:
         Raises:
 
             IncorrectStateError:
+
                 If the current state is not included in ``states``
 
         """
@@ -55,13 +56,14 @@ class ICOsystem:
                 f"{', '.join(map(repr, states))}"
             )
 
-    async def connect_stu(self) -> bool:
+    async def connect_stu(self) -> None:
         """Connect to STU
 
-        Returns:
+        Raises:
 
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         Examples:
 
@@ -85,43 +87,37 @@ class ICOsystem:
 
         self._check_state({State.DISCONNECTED}, "Connecting to STU")
 
-        try:
-            # pylint: disable=unnecessary-dunder-call
-            self.stu = await self.connection.__aenter__()
-            # pylint: enable=unnecessary-dunder-call
-            self.state = State.STU_CONNECTED
-            assert isinstance(self.stu, STU)
-            return True
-        except NoResponseError:
-            return False
+        # pylint: disable=unnecessary-dunder-call
+        self.stu = await self.connection.__aenter__()
+        # pylint: enable=unnecessary-dunder-call
+        self.state = State.STU_CONNECTED
+        assert isinstance(self.stu, STU)
 
-    async def disconnect_stu(self) -> bool:
+    async def disconnect_stu(self) -> None:
         """Disconnect from STU
 
-        Returns:
+        Raises:
 
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         """
 
         self._check_state({State.STU_CONNECTED}, "Disconnecting from STU")
 
-        try:
-            await self.connection.__aexit__(None, None, None)
-            self.state = State.DISCONNECTED
-            self.stu = None
-            return True
-        except NoResponseError:
-            return False
+        await self.connection.__aexit__(None, None, None)
+        self.state = State.DISCONNECTED
+        self.stu = None
 
-    async def reset_stu(self) -> bool:
+    async def reset_stu(self) -> None:
         """Reset STU
 
-        Returns:
+        Raises:
 
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         Examples:
 
@@ -154,30 +150,26 @@ class ICOsystem:
 
         assert isinstance(self.stu, STU)
 
-        try:
+        await self.stu.reset()
 
-            await self.stu.reset()
-
-            # Make sure that the STU is in the correct state after the reset,
-            # although this seems to be the case anyway. At least in my limited
-            # tests the STU was always in the “operating state” even directly
-            # after the reset.
-            operating = NodeState(location="Application", state="Operating")
-            while (state := await self.stu.get_state()) != operating:
-                await sleep(1)
-        except NoResponseError:
-            return False
+        # Make sure that the STU is in the correct state after the reset,
+        # although this seems to be the case anyway. At least in my limited
+        # tests the STU was always in the “operating state” even directly
+        # after the reset.
+        operating = NodeState(location="Application", state="Operating")
+        while (state := await self.stu.get_state()) != operating:
+            await sleep(1)
 
         assert state == operating
-        return True
 
-    async def enable_ota(self) -> bool:
+    async def enable_ota(self) -> None:
         """Enable OTA (Over The Air) update mode
 
-        Returns:
+        Raises:
 
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         Examples:
 
@@ -199,13 +191,9 @@ class ICOsystem:
 
         assert isinstance(self.stu, STU)
 
-        try:
-            # The coroutine below activates the advertisement required for the
-            # Over The Air (OTA) firmware update.
-            await self.stu.activate_bluetooth()
-            return True
-        except NoResponseError:
-            return False
+        # The coroutine below activates the advertisement required for the
+        # Over The Air (OTA) firmware update.
+        await self.stu.activate_bluetooth()
 
     async def collect_sensor_nodes(self) -> list[SensorNodeInfo]:
         """Get available sensor nodes
@@ -214,6 +202,16 @@ class ICOsystem:
 
         - no new sensor node was found or
         - until the given timeout, if no sensor node was found.
+
+        Returns:
+
+            A list containing information about the available sensor nodes
+
+        Raises:
+
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         Examples:
 
@@ -244,22 +242,24 @@ class ICOsystem:
 
         return await self.stu.collect_sensor_nodes()
 
-    async def connect_sensor_node_mac(self, mac_address: str) -> bool:
+    async def connect_sensor_node_mac(self, mac_address: str) -> None:
         """Connect to the node with the specified MAC address
 
         Args:
 
             mac_address:
+
                 The MAC address of the sensor node
-
-        Returns:
-
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
 
         Raises:
 
-            ``ArgumentError``, if the specified MAC address is not valid
+            ArgumentError:
+
+                If the specified MAC address is not valid
+
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         Examples:
 
@@ -299,24 +299,23 @@ class ICOsystem:
 
         assert isinstance(eui, EUI)
 
-        try:
-            self.sensor_node_connection = self.stu.connect_sensor_node(eui)
-            # pylint: disable=unnecessary-dunder-call
-            self.sensor_node = await self.sensor_node_connection.__aenter__()
-            # pylint: enable=unnecessary-dunder-call
-        except NoResponseError:
-            return False
+        self.sensor_node_connection = self.stu.connect_sensor_node(eui)
+        assert isinstance(self.sensor_node_connection, AsyncSensorNodeManager)
+        # pylint: disable=unnecessary-dunder-call
+        self.sensor_node = await self.sensor_node_connection.__aenter__()
+        # pylint: enable=unnecessary-dunder-call
+        assert isinstance(self.sensor_node, SensorNode)
 
         self.state = State.SENSOR_NODE_CONNECTED
-        return True
 
-    async def disconnect_sensor_node(self) -> bool:
+    async def disconnect_sensor_node(self) -> None:
         """Disconnect from current sensor node
 
-        Returns:
+        Raises:
 
-            - ``True``, if everything worked as expected or
-            - ``False``, if there was no response from the STU
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
 
         """
 
@@ -328,15 +327,10 @@ class ICOsystem:
         assert isinstance(self.sensor_node, SensorNode)
         assert isinstance(self.sensor_node_connection, AsyncSensorNodeManager)
 
-        try:
-            await self.sensor_node_connection.__aexit__(None, None, None)
-        except NoResponseError:
-            return False
+        await self.sensor_node_connection.__aexit__(None, None, None)
 
         self.sensor_node = None
         self.state = State.STU_CONNECTED
-
-        return True
 
     async def is_sensor_node_connected(self) -> bool:
         """Check if the STU is connected to a sensor node

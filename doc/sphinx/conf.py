@@ -37,7 +37,7 @@ doctest_test_doctest_blocks = ""
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-# -- Autodoc Configuration ----------------------------------------------------
+# -- Autodoc ------------------------------------------------------------------
 
 autoclass_content = "both"
 autodoc_inherit_docstrings = False

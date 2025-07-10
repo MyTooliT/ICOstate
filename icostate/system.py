@@ -379,6 +379,104 @@ class ICOsystem:
 
         return await self.stu.is_connected()
 
+    async def rename(
+        self, new_name: str, mac_address: str | None = None
+    ) -> None:
+        """Set the name of the sensor node with the specified MAC address
+
+        Depending on the state the system is in this coroutine will **either**:
+
+        1. connect to the sensor device with the given MAC address, if there
+           is no connection yet and disconnect afterwards or
+        2. just use the current connection and rename the current sensor
+           device. In this case the given MAC address will be ignored!
+
+        Args:
+
+            new_name:
+
+                The new name of the sensor device
+
+            mac_address:
+
+                The MAC address of the sensor device that should be renamed
+
+        Raises:
+
+            NoResponseError: If there was no response to an request made by
+                             this coroutine
+
+            ValueError: If you call this method without specifying the MAC
+                        address while the system is not connected to a sensor
+                        node
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Rename a disconnected sensor node
+
+            >>> async def rename_disconnected(icosystem: ICOsystem,
+            ...                               mac_address: str,
+            ...                               name: str):
+            ...     await icosystem.connect_stu()
+            ...     print(f"Before renaming: {icosystem.state!r}")
+            ...     await icosystem.rename(name, mac_address)
+            ...     print(f"After renaming: {icosystem.state!r}")
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> name = "Test-STH"
+            >>> run(rename_disconnected(ICOsystem(), mac_address, name))
+            Before renaming: STU Connected
+            After renaming: STU Connected
+
+            Rename a connected sensor node
+
+            >>> async def rename_connected(icosystem: ICOsystem,
+            ...                            mac_address: str,
+            ...                            name: str):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     print(f"Before renaming: {icosystem.state!r}")
+            ...     await icosystem.rename(name, None)
+            ...     print(f"After renaming: {icosystem.state!r}")
+            ...     await icosystem.disconnect_sensor_node()
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> name = "Test-STH"
+            >>> run(rename_connected(ICOsystem(), mac_address, name))
+            Before renaming: Sensor Node Connected
+            After renaming: Sensor Node Connected
+
+        """
+
+        self._check_state(
+            {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
+            "Renaming sensor device",
+        )
+        assert isinstance(self.stu, STU)
+
+        disconnect_after_renaming = False
+        if self.state == State.STU_CONNECTED:
+            if not isinstance(mac_address, str):
+                raise ValueError(
+                    "MAC address is required for connecting to sensor node"
+                )
+
+            assert isinstance(mac_address, str)
+            disconnect_after_renaming = True
+            await self.connect_sensor_node_mac(mac_address)
+
+        assert isinstance(self.sensor_node, SensorNode)
+
+        await self.sensor_node.set_name(new_name)
+        if disconnect_after_renaming:
+            await self.disconnect_sensor_node()
+
 
 if __name__ == "__main__":
     from doctest import testmod

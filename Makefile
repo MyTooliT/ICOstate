@@ -7,7 +7,7 @@ SPHINX_INPUT_DIRECTORY := doc/sphinx
 # -- Rules ---------------------------------------------------------------------
 
 .PHONY: all
-all: check test
+all: check test coverage
 
 .PHONY: check
 check:
@@ -17,11 +17,15 @@ check:
 
 .PHONY: test
 test:
-	poetry run pytest .
+	poetry run coverage run -m pytest .
 
 .PHONY: test-no-hardware
 test-no-hardware:
-	poetry run pytest --ignore '$(PACKAGE)/system.py'
+	poetry run coverage run -m pytest --ignore '$(PACKAGE)/system.py'
+
+.PHONY: coverage
+coverage:
+	poetry run coverage report
 
 .PHONY: documentation
 documentation:

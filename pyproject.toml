@@ -28,6 +28,7 @@ version = "0.7"
 [project.optional-dependencies]
 dev = [
   "black>=25.1.0",
+  "coverage>=7.9.2",
   "Flake8-pyproject>=1.2.3",
   "furo>=2024.8.6",
   "mypy>=1.16.1",

@@ -43,6 +43,7 @@ dev = [
 ]
 test = [
   "pytest-asyncio>=1.0.0",
+  "pytest-sphinx>=0.6.3",
 ]
 
 [tool.black]

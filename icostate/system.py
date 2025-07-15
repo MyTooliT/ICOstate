@@ -7,6 +7,7 @@
 from asyncio import sleep
 
 from netaddr import AddrFormatError, EUI
+from pyee.asyncio import AsyncIOEventEmitter
 
 from icotronic.can import Connection, STU
 from icotronic.can.node.sensor import SensorNode
@@ -20,10 +21,24 @@ from icostate.state import State
 # -- Classes ------------------------------------------------------------------
 
 
-class ICOsystem:
-    """Stateful access to ICOtronic system"""
+class ICOsystem(AsyncIOEventEmitter):
+    """Stateful access to ICOtronic system
 
-    def __init__(self):
+    Args:
+
+        *arguments:
+
+            Positional arguments (handled by pyee)
+
+        **keyword_arguments:
+
+            Keyword arguments (handled by pyee)
+
+    """
+
+    def __init__(self, *arguments, **keyword_arguments):
+        super().__init__(*arguments, **keyword_arguments)
+
         self.state = State.DISCONNECTED
         self.connection = Connection()
         self.stu: STU | None = None
@@ -316,6 +331,7 @@ class ICOsystem:
         self.sensor_node_attributes = SensorNodeAttributes(
             mac_address=mac_address, name=name
         )
+        self.emit("sensor_node_attributes", self.sensor_node_attributes)
         self.state = State.SENSOR_NODE_CONNECTED
 
     async def disconnect_sensor_node(self) -> None:
@@ -483,8 +499,14 @@ class ICOsystem:
             await self.connect_sensor_node_mac(mac_address)
 
         assert isinstance(self.sensor_node, SensorNode)
+        # Sensor node attributes should have been set at least once by
+        # calling `connect_sensor_node_mac` either directly or indirectly.
+        assert isinstance(self.sensor_node_attributes, SensorNodeAttributes)
 
         await self.sensor_node.set_name(new_name)
+        self.sensor_node_attributes.name = new_name
+        self.emit("sensor_node_attributes", self.sensor_node_attributes)
+
         if disconnect_after_renaming:
             await self.disconnect_sensor_node()
 

@@ -13,6 +13,7 @@ from icotronic.can.node.sensor import SensorNode
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
 
+from icostate.sensor import SensorNodeAttributes
 from icostate.error import IncorrectStateError
 from icostate.state import State
 
@@ -28,6 +29,9 @@ class ICOsystem:
         self.stu: STU | None = None
         self.sensor_node_connection: AsyncSensorNodeManager | None = None
         self.sensor_node: SensorNode = None
+
+        self.sensor_node_attributes: SensorNodeAttributes | None = None
+        """Information about currently connected sensor node"""
 
     def _check_state(self, states: set[State], description: str) -> None:
         """Check if the system is in an allowed state
@@ -306,6 +310,12 @@ class ICOsystem:
         # pylint: enable=unnecessary-dunder-call
         assert isinstance(self.sensor_node, SensorNode)
 
+        mac_address = await self.sensor_node.get_mac_address()
+        name = await self.sensor_node.get_name()
+
+        self.sensor_node_attributes = SensorNodeAttributes(
+            mac_address=mac_address, name=name
+        )
         self.state = State.SENSOR_NODE_CONNECTED
 
     async def disconnect_sensor_node(self) -> None:
@@ -330,6 +340,7 @@ class ICOsystem:
         await self.sensor_node_connection.__aexit__(None, None, None)
 
         self.sensor_node = None
+        self.sensor_node_attributes = None
         self.state = State.STU_CONNECTED
 
     async def is_sensor_node_connected(self) -> bool:

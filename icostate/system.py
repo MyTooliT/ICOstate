@@ -326,12 +326,13 @@ class ICOsystem(AsyncIOEventEmitter):
         assert isinstance(self.sensor_node, SensorNode)
 
         mac_address = await self.sensor_node.get_mac_address()
+        self.emit("sensor_node_mac_address", mac_address)
         name = await self.sensor_node.get_name()
+        self.emit("sensor_node_name", name)
 
         self.sensor_node_attributes = SensorNodeAttributes(
             mac_address=mac_address, name=name
         )
-        self.emit("sensor_node_attributes", self.sensor_node_attributes)
         self.state = State.SENSOR_NODE_CONNECTED
 
     async def disconnect_sensor_node(self) -> None:
@@ -505,7 +506,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         await self.sensor_node.set_name(new_name)
         self.sensor_node_attributes.name = new_name
-        self.emit("sensor_node_attributes", self.sensor_node_attributes)
+        self.emit("sensor_node_name", self.sensor_node_attributes.name)
 
         if disconnect_after_renaming:
             await self.disconnect_sensor_node()

@@ -72,9 +72,9 @@ To retrieve information about available sensor nodes use the coroutine :meth:`IC
 
    >>> from asyncio import run
    >>> from netaddr import EUI
-   >>> from icostate import ICOsystem
+   >>> from icostate import ICOsystem, SensorNodeInfo
 
-   >>> async def get_sensor_nodes(icosystem: ICOsystem):
+   >>> async def get_sensor_nodes(icosystem: ICOsystem) -> list[SensorNodeInfo]:
    ...     await icosystem.connect_stu()
    ...     sensor_nodes = await icosystem.collect_sensor_nodes()
    ...     await icosystem.disconnect_stu()

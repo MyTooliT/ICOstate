@@ -176,7 +176,7 @@ The example below shows how you can react to changes of the sensor node name:
    ...
    ...     await icosystem.connect_stu()
    ...     await icosystem.connect_sensor_node_mac(mac_address)
-   ...     await sleep(0)  # Allow scheduler to trigger event coroutines
+   ...     await sleep(0)  # Allow scheduler to trigger event coroutine
    ...     await icosystem.disconnect_sensor_node()
    ...     await icosystem.disconnect_stu()
 

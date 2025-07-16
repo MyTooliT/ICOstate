@@ -62,3 +62,35 @@ In case you have the ICOtronic system does not react as you expect you can reset
    ...     await icosystem.disconnect_stu()
 
    >>> run(reset_stu(ICOsystem()))
+
+Finding Available Sensor Nodes
+******************************
+
+To retrieve information about available sensor nodes use the coroutine :meth:`ICOsystem.collect_sensor_nodes`.
+
+.. doctest::
+
+   >>> from asyncio import run
+   >>> from netaddr import EUI
+   >>> from icostate import ICOsystem
+
+   >>> async def get_sensor_nodes(icosystem: ICOsystem):
+   ...     await icosystem.connect_stu()
+   ...     sensor_nodes = await icosystem.collect_sensor_nodes()
+   ...     await icosystem.disconnect_stu()
+   ...     return sensor_nodes
+
+   >>> sensor_nodes = run(get_sensor_nodes(ICOsystem()))
+   >>> # We assume that at least one sensor node is available
+   >>> len(sensor_nodes) >= 1
+   True
+   >>> node_info = sensor_nodes[0]
+   >>> # Each list entry contains information about name, MAC address and RSSI
+   >>> isinstance(node_info.name, str)
+   True
+   >>> len(node_info.name) <= 8
+   True
+   >>> isinstance(node_info.mac_address, EUI)
+   True
+   >>> -70 < node_info.rssi < 0
+   True

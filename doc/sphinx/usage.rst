@@ -124,3 +124,29 @@ Before you start a measurement you need to connect to a sensor node. To do that 
    Connected: False
    Connected: True
    Connected: False
+
+Rename a Sensor Node
+********************
+
+To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requires the new name of the sensor node as parameter. If the system is currently not connected to a sensor node, then the coroutine also requires the MAC address of the sensor node. After using the coroutine successfully the system will switch back to the state it was in before renaming the sensor node (either “STU Connected” or “Sensor Node Connected”).
+
+.. doctest::
+
+   >>> from asyncio import run
+   >>> from icostate import ICOsystem
+
+   >>> async def rename_disconnected(icosystem: ICOsystem,
+   ...                               mac_address: str,
+   ...                               new_name: str):
+   ...     await icosystem.connect_stu()
+   ...     print(f"State Before: {icosystem.state!r}")
+   ...     await icosystem.rename(new_name, mac_address)
+   ...     print(f"State After: {icosystem.state!r}")
+   ...     await icosystem.disconnect_stu()
+
+   >>> mac_address = (
+   ...     "08-6B-D7-01-DE-81") # Change to MAC address of your sensor node
+   >>> name = "Test-STH"
+   >>> run(rename_disconnected(ICOsystem(), mac_address, name))
+   State Before: STU Connected
+   State After: STU Connected

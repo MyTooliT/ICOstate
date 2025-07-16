@@ -150,3 +150,35 @@ To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requir
    >>> run(rename_disconnected(ICOsystem(), mac_address, name))
    State Before: STU Connected
    State After: STU Connected
+
+Events
+######
+
+Objects of the :class:`ICOsystem` provides an event based API (based on [pyee](https://pyee.readthedocs.io)) you can use to react to changes to the system. Currently the following events are supported:
+
+- ``sensor_node_name``: Called when the name of the current sensor node changes
+- ``sensor_node_mac_address``: Called when the MAC address of a sensor node changes
+
+The example below shows how you can react to changes of the sensor node name:
+
+.. doctest::
+
+   >>> from asyncio import sleep, run
+   >>> from icostate import ICOsystem
+
+   >>> async def react_sensor_node_name(icosystem: ICOsystem, mac_address: str):
+   ...
+   ...     @icosystem.on("sensor_node_name")
+   ...     async def name_changed(name: str):
+   ...         print(f"Name of sensor node: {name}")
+   ...
+   ...     await icosystem.connect_stu()
+   ...     await icosystem.connect_sensor_node_mac(mac_address)
+   ...     await sleep(0)  # Allow scheduler to trigger event coroutines
+   ...     await icosystem.disconnect_sensor_node()
+   ...     await icosystem.disconnect_stu()
+
+   >>> mac_address = "08-6B-D7-01-DE-81"  # Change to MAC address of your
+   >>>                                    # sensor node
+   >>> run(react_sensor_node_name(ICOsystem(), mac_address))
+   Name of sensor node: Test-STH

@@ -94,3 +94,33 @@ To retrieve information about available sensor nodes use the coroutine :meth:`IC
    True
    >>> -70 < node_info.rssi < 0
    True
+
+Sensor Node
+###########
+
+Connecting to Sensor Node
+*************************
+
+Before you start a measurement you need to connect to a sensor node. To do that use the coroutine :meth:`ICOsystem.connect_sensor_node_mac`. Please do not forget to disconnect from the node with the coroutine :meth:`ICOsystem.disconnect_sensor_node` afterwards.
+
+.. doctest::
+
+   >>> from asyncio import run
+   >>> from icostate import ICOsystem
+
+   >>> async def connect_disconnect_sensor_node(icosystem: ICOsystem,
+   ...                                          mac_address: str):
+   ...     await icosystem.connect_stu()
+   ...     print(f"Connected: {await icosystem.is_sensor_node_connected()}")
+   ...     await icosystem.connect_sensor_node_mac(mac_address)
+   ...     print(f"Connected: {await icosystem.is_sensor_node_connected()}")
+   ...     await icosystem.disconnect_sensor_node()
+   ...     print(f"Connected: {await icosystem.is_sensor_node_connected()}")
+   ...     await icosystem.disconnect_stu()
+
+   >>> mac_address = (
+   ...     "08-6B-D7-01-DE-81") # Change to MAC address of your sensor node
+   >>> run(connect_disconnect_sensor_node(ICOsystem(), mac_address))
+   Connected: False
+   Connected: True
+   Connected: False

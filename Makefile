@@ -4,10 +4,13 @@ MODULE = icostate
 SPHINX_DIRECTORY := sphinx
 SPHINX_INPUT_DIRECTORY := doc/sphinx
 
+TEST_DIRECTORY := test
 # Note: The pytest plugin `pytest-sphinx` (version 0.6.3) does unfortunately not
 # find our API documentation doctests, hence we specify the test files (*.rst)
 # manually.
-TEST_LOCATIONS := $(SPHINX_INPUT_DIRECTORY)/usage.rst $(MODULE) test
+TEST_LOCATIONS := $(SPHINX_INPUT_DIRECTORY)/usage.rst \
+				  $(MODULE) \
+	 			  $(TEST_DIRECTORY)
 
 # -- Rules ---------------------------------------------------------------------
 
@@ -26,7 +29,9 @@ test:
 
 .PHONY: test-no-hardware
 test-no-hardware:
-	poetry run coverage run -m pytest --ignore '$(MODULE)/system.py'
+	poetry run coverage run -m pytest \
+		--ignore '$(MODULE)/system.py' \
+		--ignore '$(TEST_DIRECTORY)/test_system.py'
 
 .PHONY: coverage
 coverage:

@@ -154,10 +154,12 @@ To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requir
 Events
 ######
 
-Objects of the :class:`ICOsystem` provides an event based API (based on [pyee](https://pyee.readthedocs.io)) you can use to react to changes to the system. Currently the following events are supported:
+Objects of the :class:`ICOsystem` provides an event based API (based on `pyee`_) you can use to react to changes to the system. Currently the following events are supported:
 
 - ``sensor_node_name``: Called when the name of the current sensor node changes
 - ``sensor_node_mac_address``: Called when the MAC address of a sensor node changes
+
+.. _pyee: https://pyee.readthedocs.io
 
 The example below shows how you can react to changes of the sensor node name:
 

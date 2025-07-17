@@ -4,6 +4,7 @@
 
 from asyncio import sleep
 
+from netaddr import EUI
 from pytest import mark
 
 from icostate.system import ICOsystem
@@ -25,12 +26,14 @@ async def test_connect():
     mac_address_event_triggered = False
 
     @icosystem.on("sensor_node_name")
-    async def name_changed(data):  # pylint: disable=unused-argument
+    async def name_changed(name: str):
+        assert isinstance(name, str)
         nonlocal name_event_triggered
         name_event_triggered = True
 
     @icosystem.on("sensor_node_mac_address")
-    async def mac_address_changed(data):  # pylint: disable=unused-argument
+    async def mac_address_changed(mac_address: EUI):
+        assert isinstance(mac_address, EUI)
         nonlocal mac_address_event_triggered
         mac_address_event_triggered = True
 
@@ -51,7 +54,8 @@ async def test_rename():
     name_event_triggered = False
 
     @icosystem.on("sensor_node_name")
-    async def name_changed(data):  # pylint: disable=unused-argument
+    async def name_changed(name: str):
+        assert isinstance(name, str)
         nonlocal name_event_triggered
         name_event_triggered = True
 

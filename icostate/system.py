@@ -547,8 +547,9 @@ class ICOsystem(AsyncIOEventEmitter):
 
         1. connect to the sensor device with the given MAC address, if there
            is no connection yet and disconnect afterwards or
-        2. just use the current connection and rename the current sensor
-           device. In this case the given MAC address will be ignored!
+        2. just use the current connection and get the ADC configuration of
+           the current sensor device. In this case the given MAC address will
+           be ignored!
 
         Args:
 

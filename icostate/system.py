@@ -10,6 +10,7 @@ from netaddr import AddrFormatError, EUI
 from pyee.asyncio import AsyncIOEventEmitter
 
 from icotronic.can import Connection, STU
+from icotronic.can.adc import ADCConfiguration
 from icotronic.can.node.sensor import SensorNode
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
@@ -408,6 +409,42 @@ class ICOsystem(AsyncIOEventEmitter):
 
         return await self.stu.is_connected()
 
+    async def _connect_sensor_node(
+        self, mac_address: str | None = None
+    ) -> bool:
+        """Connect to sensor node if not already connected
+
+        Args:
+
+            mac_address:
+
+                The MAC address of the sensor device that this coroutine
+                connects to, if the system is not already connected to a
+                sensor node
+
+        Returns:
+
+            - ``True``, if the system was **not** connected to a sensor node
+                        before
+            - ``False``, otherwise
+
+        """
+
+        disconnected_before = False
+        if self.state == State.STU_CONNECTED:
+            if not isinstance(mac_address, str):
+                raise ValueError(
+                    "MAC address is required for connecting to sensor node"
+                )
+
+            assert isinstance(mac_address, str)
+            disconnected_before = True
+            await self.connect_sensor_node_mac(mac_address)
+
+        assert isinstance(self.sensor_node, SensorNode)
+
+        return disconnected_before
+
     async def rename(
         self, new_name: str, mac_address: str | None = None
     ) -> None:
@@ -451,9 +488,9 @@ class ICOsystem(AsyncIOEventEmitter):
             ...                               mac_address: str,
             ...                               name: str):
             ...     await icosystem.connect_stu()
-            ...     print(f"Before renaming: {icosystem.state!r}")
+            ...     print(f"Before renaming: {icosystem.state}")
             ...     await icosystem.rename(name, mac_address)
-            ...     print(f"After renaming: {icosystem.state!r}")
+            ...     print(f"After renaming: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
             >>> mac_address = (
             ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
@@ -469,9 +506,9 @@ class ICOsystem(AsyncIOEventEmitter):
             ...                            name: str):
             ...     await icosystem.connect_stu()
             ...     await icosystem.connect_sensor_node_mac(mac_address)
-            ...     print(f"Before renaming: {icosystem.state!r}")
+            ...     print(f"Before renaming: {icosystem.state}")
             ...     await icosystem.rename(name, None)
-            ...     print(f"After renaming: {icosystem.state!r}")
+            ...     print(f"After renaming: {icosystem.state}")
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
             >>> mac_address = (
@@ -489,18 +526,7 @@ class ICOsystem(AsyncIOEventEmitter):
         )
         assert isinstance(self.stu, STU)
 
-        disconnect_after_renaming = False
-        if self.state == State.STU_CONNECTED:
-            if not isinstance(mac_address, str):
-                raise ValueError(
-                    "MAC address is required for connecting to sensor node"
-                )
-
-            assert isinstance(mac_address, str)
-            disconnect_after_renaming = True
-            await self.connect_sensor_node_mac(mac_address)
-
-        assert isinstance(self.sensor_node, SensorNode)
+        disconnect_after = await self._connect_sensor_node(mac_address)
         # Sensor node attributes should have been set at least once by
         # calling `connect_sensor_node_mac` either directly or indirectly.
         assert isinstance(self.sensor_node_attributes, SensorNodeAttributes)
@@ -509,8 +535,104 @@ class ICOsystem(AsyncIOEventEmitter):
         self.sensor_node_attributes.name = new_name
         self.emit("sensor_node_name", self.sensor_node_attributes.name)
 
-        if disconnect_after_renaming:
+        if disconnect_after:
             await self.disconnect_sensor_node()
+
+    async def read_adc(
+        self, mac_address: str | None = None
+    ) -> ADCConfiguration:
+        """Read the ADC configuration of a sensor node
+
+        Depending on the state the system is in this coroutine will **either**:
+
+        1. connect to the sensor device with the given MAC address, if there
+           is no connection yet and disconnect afterwards or
+        2. just use the current connection and rename the current sensor
+           device. In this case the given MAC address will be ignored!
+
+        Args:
+
+            mac_address:
+
+                The MAC address of the sensor device for which we want to
+                retrieve the ADC configuration
+
+        Raises:
+
+            NoResponseError: If there was no response to an request made by
+                             this coroutine
+
+            ValueError: If you call this method without specifying the MAC
+                        address while the system is not connected to a sensor
+                        node
+
+        Returns:
+
+            The ADC configuration of the sensor node
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Read the ADC configuration of a disconnected sensor node
+
+            >>> async def read_adc(icosystem: ICOsystem,
+            ...                    mac_address: str) -> ADCConfiguration:
+            ...     await icosystem.connect_stu()
+            ...     print(f"Before reading ADC config: {icosystem.state}")
+            ...     adc_config = await icosystem.read_adc(mac_address)
+            ...     print(f"After reading ADC config: {icosystem.state}")
+            ...     await icosystem.disconnect_stu()
+            ...     return adc_config
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> config = run(read_adc(ICOsystem(), mac_address))
+            Before reading ADC config: STU Connected
+            After reading ADC config: STU Connected
+            >>> isinstance(config.prescaler, int)
+            True
+            >>> isinstance(config.acquisition_time, int)
+            True
+            >>> isinstance(config.oversampling_rate, int)
+            True
+            >>> isinstance(config.reference_voltage, float)
+            True
+            >>> 1 <= config.prescaler <= 127
+            True
+
+            Read the ADC configuration of a connected sensor node
+
+            >>> async def read_adc(icosystem: ICOsystem,
+            ...                    mac_address: str) -> ADCConfiguration:
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     adc_config = await icosystem.read_adc()
+            ...     await icosystem.disconnect_sensor_node()
+            ...     await icosystem.disconnect_stu()
+            ...     return adc_config
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> config = run(read_adc(ICOsystem(), mac_address))
+            >>> isinstance(config, ADCConfiguration)
+            True
+
+        """
+
+        self._check_state(
+            {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
+            "Reading ADC configuration of sensor node",
+        )
+
+        disconnect_after = await self._connect_sensor_node(mac_address)
+
+        adc_config = await self.sensor_node.get_adc_configuration()
+
+        if disconnect_after:
+            await self.disconnect_sensor_node()
+
+        return adc_config
 
 
 if __name__ == "__main__":

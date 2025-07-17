@@ -631,12 +631,16 @@ class ICOsystem(AsyncIOEventEmitter):
 
         disconnect_after = await self._connect_sensor_node(mac_address)
 
-        adc_config = await self.sensor_node.get_adc_configuration()
+        # Sensor node attributes should have been set at least once by
+        # calling `connect_sensor_node_mac` either directly or indirectly.
+        adc_configuration = await self.sensor_node.get_adc_configuration()
+        self.sensor_node.adc_configuration = adc_configuration
+        self.emit("sensor_node_adc_configuration", adc_configuration)
 
         if disconnect_after:
             await self.disconnect_sensor_node()
 
-        return adc_config
+        return adc_configuration
 
 
 if __name__ == "__main__":

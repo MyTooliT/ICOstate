@@ -14,8 +14,8 @@ class State(Enum):
     STU_CONNECTED = auto()
     SENSOR_NODE_CONNECTED = auto()
 
-    def __repr__(self) -> str:
-        """Get string representation of state
+    def __str__(self) -> str:
+        """Get informal string representation of state
 
         Returns:
 
@@ -25,10 +25,10 @@ class State(Enum):
 
             Show the string representation of some states
 
-            >>> State.STU_CONNECTED
+            >>> print(State.STU_CONNECTED)
             STU Connected
 
-            >>> State.DISCONNECTED
+            >>> print(State.DISCONNECTED)
             Disconnected
 
         """

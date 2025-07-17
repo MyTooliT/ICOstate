@@ -72,7 +72,7 @@ class ICOsystem(AsyncIOEventEmitter):
             plural = "" if len(states) <= 1 else "s"
             raise IncorrectStateError(
                 f"{description} only allowed in the state{plural}: "
-                f"{', '.join(map(repr, states))}"
+                f"{', '.join(map(str, states))}"
             )
 
     async def connect_stu(self) -> None:
@@ -93,14 +93,15 @@ class ICOsystem(AsyncIOEventEmitter):
             Connect and disconnect from STU
 
             >>> async def connect_disconnect_stu(icosystem: ICOsystem):
-            ...     states = [icosystem.state]
+            ...     print(f"Before connection to STU: {icosystem.state}")
             ...     await icosystem.connect_stu()
-            ...     states.append(icosystem.state)
+            ...     print(f"After connection to STU: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
-            ...     states.append(icosystem.state)
-            ...     return states
+            ...     print(f"After disconnection fro STU: {icosystem.state}")
             >>> run(connect_disconnect_stu(ICOsystem()))
-            [Disconnected, STU Connected, Disconnected]
+            Before connection to STU: Disconnected
+            After connection to STU: STU Connected
+            After disconnection fro STU: Disconnected
 
         """
 
@@ -299,8 +300,8 @@ class ICOsystem(AsyncIOEventEmitter):
             >>> mac_address = (
             ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
             >>> run(connect_sensor_node(ICOsystem(), mac_address))
-            State.SENSOR_NODE_CONNECTED
-            State.STU_CONNECTED
+            Sensor Node Connected
+            STU Connected
 
         """
 

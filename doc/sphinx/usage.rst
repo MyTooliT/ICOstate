@@ -139,9 +139,9 @@ To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requir
    ...                               mac_address: str,
    ...                               new_name: str):
    ...     await icosystem.connect_stu()
-   ...     print(f"State Before: {icosystem.state!r}")
+   ...     print(f"State Before: {icosystem.state}")
    ...     await icosystem.rename(new_name, mac_address)
-   ...     print(f"State After: {icosystem.state!r}")
+   ...     print(f"State After: {icosystem.state}")
    ...     await icosystem.disconnect_stu()
 
    >>> mac_address = (

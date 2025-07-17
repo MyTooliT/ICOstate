@@ -538,7 +538,7 @@ class ICOsystem(AsyncIOEventEmitter):
         if disconnect_after:
             await self.disconnect_sensor_node()
 
-    async def read_adc(
+    async def get_adc_configuration(
         self, mac_address: str | None = None
     ) -> ADCConfiguration:
         """Read the ADC configuration of a sensor node
@@ -578,17 +578,19 @@ class ICOsystem(AsyncIOEventEmitter):
 
             Read the ADC configuration of a disconnected sensor node
 
-            >>> async def read_adc(icosystem: ICOsystem,
-            ...                    mac_address: str) -> ADCConfiguration:
+            >>> async def get_adc_configuration(icosystem: ICOsystem,
+            ...                                 mac_address: str
+            ...                                ) -> ADCConfiguration:
             ...     await icosystem.connect_stu()
             ...     print(f"Before reading ADC config: {icosystem.state}")
-            ...     adc_config = await icosystem.read_adc(mac_address)
+            ...     adc_config = (await
+            ...         icosystem.get_adc_configuration(mac_address))
             ...     print(f"After reading ADC config: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
             >>> mac_address = (
             ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> config = run(read_adc(ICOsystem(), mac_address))
+            >>> config = run(get_adc_configuration(ICOsystem(), mac_address))
             Before reading ADC config: STU Connected
             After reading ADC config: STU Connected
             >>> isinstance(config.prescaler, int)
@@ -604,17 +606,18 @@ class ICOsystem(AsyncIOEventEmitter):
 
             Read the ADC configuration of a connected sensor node
 
-            >>> async def read_adc(icosystem: ICOsystem,
-            ...                    mac_address: str) -> ADCConfiguration:
+            >>> async def get_adc_configuration(icosystem: ICOsystem,
+            ...                                 mac_address: str
+            ...                                ) -> ADCConfiguration:
             ...     await icosystem.connect_stu()
             ...     await icosystem.connect_sensor_node_mac(mac_address)
-            ...     adc_config = await icosystem.read_adc()
+            ...     adc_config = await icosystem.get_adc_configuration()
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
             >>> mac_address = (
             ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> config = run(read_adc(ICOsystem(), mac_address))
+            >>> config = run(get_adc_configuration(ICOsystem(), mac_address))
             >>> isinstance(config, ADCConfiguration)
             True
 

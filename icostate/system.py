@@ -626,7 +626,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         self._check_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
-            "Reading ADC configuration of sensor node",
+            "Getting ADC configuration of sensor node",
         )
 
         disconnect_after = await self._connect_sensor_node(mac_address)

@@ -642,6 +642,103 @@ class ICOsystem(AsyncIOEventEmitter):
 
         return adc_configuration
 
+    async def set_adc_configuration(
+        self,
+        adc_configuration: ADCConfiguration,
+        mac_address: str | None = None,
+    ) -> None:
+        """Change the ADC configuration of a sensor node
+
+        Depending on the state the system is in this coroutine will **either**:
+
+        1. connect to the sensor device with the given MAC address, if there
+           is no connection yet and disconnect afterwards or
+        2. just use the current connection and change the ADC configuration of
+           the current sensor device. In this case the given MAC address will
+           be ignored!
+
+        Args:
+
+            mac_address:
+
+                The MAC address of the sensor device for which we want to
+                change the ADC configuration
+
+        Raises:
+
+            NoResponseError: If there was no response to an request made by
+                             this coroutine
+
+            ValueError: If you call this method without specifying the MAC
+                        address while the system is not connected to a sensor
+                        node
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+
+            Set the ADC configuration of a disconnected sensor node
+
+            >>> async def set_adc_configuration(icosystem: ICOsystem,
+            ...                                 adc_config: ADCConfiguration,
+            ...                                 mac_address: str):
+            ...     await icosystem.connect_stu()
+            ...     print(f"Before setting ADC config: {icosystem.state}")
+            ...     adc_config = (await
+            ...         icosystem.set_adc_configuration(adc_config,
+            ...                                         mac_address))
+            ...     print(f"After setting ADC config: {icosystem.state}")
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> config = ADCConfiguration(prescaler=2,
+            ...                           acquisition_time=8,
+            ...                           oversampling_rate=64)
+            >>> config = run(set_adc_configuration(ICOsystem(), config,
+            ...                                    mac_address))
+            Before setting ADC config: STU Connected
+            After setting ADC config: STU Connected
+
+            Set the ADC configuration of a connected sensor node
+
+            >>> async def set_adc_configuration(icosystem: ICOsystem,
+            ...                                 adc_config: ADCConfiguration,
+            ...                                 mac_address: str):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     print(f"Before setting ADC config: {icosystem.state}")
+            ...     adc_config = (await
+            ...         icosystem.set_adc_configuration(adc_config))
+            ...     print(f"After setting ADC config: {icosystem.state}")
+            ...     await icosystem.disconnect_sensor_node()
+            ...     await icosystem.disconnect_stu()
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> config = ADCConfiguration(prescaler=2,
+            ...                           acquisition_time=8,
+            ...                           oversampling_rate=64)
+            >>> config = run(set_adc_configuration(ICOsystem(), config,
+            ...                                    mac_address))
+            Before setting ADC config: Sensor Node Connected
+            After setting ADC config: Sensor Node Connected
+
+        """
+
+        self._check_state(
+            {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
+            "Setting ADC configuration of sensor node",
+        )
+
+        disconnect_after = await self._connect_sensor_node(mac_address)
+
+        await self.sensor_node.set_adc_configuration(**adc_configuration)
+        self.emit("sensor_node_adc_configuration", adc_configuration)
+
+        if disconnect_after:
+            await self.disconnect_sensor_node()
+
 
 if __name__ == "__main__":
     from doctest import testmod

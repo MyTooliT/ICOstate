@@ -94,21 +94,42 @@ async def test_adc_set():
     """Test ADC set coroutine"""
 
     icosystem = ICOsystem()
-    adc_event_triggered = False
+    adc_event_triggered = 0
 
     @icosystem.on("sensor_node_adc_configuration")
     async def adc_config_changed(adc_configuration: ADCConfiguration):
         assert isinstance(adc_configuration, ADCConfiguration)
         nonlocal adc_event_triggered
-        adc_event_triggered = True
+        adc_event_triggered += 1
 
+    # Connect
     await icosystem.connect_stu()
     await icosystem.connect_sensor_node_mac(MAC_ADDRESS)
+
+    # Set non-default ADC configuration
+    non_default_adc_config = ADCConfiguration(
+        prescaler=2, acquisition_time=8, oversampling_rate=64
+    )
+    await icosystem.set_adc_configuration(non_default_adc_config)
+    await sleep(0)  # Allow scheduler to trigger event coroutines
+    assert adc_event_triggered == 1
+    adc_config = await icosystem.get_adc_configuration()
+    await sleep(0)  # Allow scheduler to trigger event coroutines
+    assert adc_event_triggered == 2
+    assert adc_config == non_default_adc_config
+
+    # Set default ADC configuration
     default_adc_config = ADCConfiguration(
         prescaler=2, acquisition_time=8, oversampling_rate=64
     )
     await icosystem.set_adc_configuration(default_adc_config)
     await sleep(0)  # Allow scheduler to trigger event coroutines
-    assert adc_event_triggered is True
+    assert adc_event_triggered == 3
+    adc_config = await icosystem.get_adc_configuration()
+    await sleep(0)  # Allow scheduler to trigger event coroutines
+    assert adc_event_triggered == 4
+    assert adc_config == default_adc_config
+
+    # Disconnect
     await icosystem.disconnect_sensor_node()
     await icosystem.disconnect_stu()

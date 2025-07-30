@@ -46,6 +46,10 @@ test = [
   "pytest-sphinx>=0.6.3",
 ]
 
+[project.urls]
+Documentation = "https://icostate.readthedocs.io"
+Source = "https://github.com/mytoolit/ICOstate"
+
 [tool.black]
 line-length = 79
 preview = true

@@ -2,17 +2,17 @@
 
 # -- Imports ------------------------------------------------------------------
 
-from enum import auto, Enum
+from enum import Enum
 
 # -- Classes ------------------------------------------------------------------
 
 
-class State(Enum):
+class State(str, Enum):
     """Contains the various states the ICOtronic system can be in"""
 
-    DISCONNECTED = auto()
-    STU_CONNECTED = auto()
-    SENSOR_NODE_CONNECTED = auto()
+    DISCONNECTED = "DISCONNECTED"
+    STU_CONNECTED = "STU_CONNECTED"
+    SENSOR_NODE_CONNECTED = "SENSOR_NODE_CONNECTED"
 
     def __str__(self) -> str:
         """Get informal string representation of state

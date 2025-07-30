@@ -8,7 +8,22 @@ from enum import Enum
 
 
 class State(str, Enum):
-    """Contains the various states the ICOtronic system can be in"""
+    """Contains the various states the ICOtronic system can be in
+
+    Examples:
+
+        Get state variables
+
+        >>> State.DISCONNECTED
+        <State.DISCONNECTED: 'DISCONNECTED'>
+
+        >>> State.STU_CONNECTED
+        <State.STU_CONNECTED: 'STU_CONNECTED'>
+
+        >>> State.SENSOR_NODE_CONNECTED
+        <State.SENSOR_NODE_CONNECTED: 'SENSOR_NODE_CONNECTED'>
+
+    """
 
     DISCONNECTED = "DISCONNECTED"
     STU_CONNECTED = "STU_CONNECTED"
@@ -37,3 +52,11 @@ class State(str, Enum):
             word.upper() if word in {"STH", "STU"} else word.capitalize()
             for word in self.name.split("_")
         ])
+
+
+# -- Main ---------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()

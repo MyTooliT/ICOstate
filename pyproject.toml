@@ -9,7 +9,8 @@ authors = [
 
 dependencies = [
   "icotronic>=3.2,<4",
-  "netaddr>=1.3.0"
+  "netaddr>=1.3.0",
+  "pyee>=13.0.0",
 ]
 description = """Stateful API for the ICOtronic system intended for usage in \
               a Web API"""
@@ -34,7 +35,6 @@ dev = [
   "mypy>=1.16.1",
   "myst-parser>=4.0.1",
   "pydoclint[flake8]>=0.6.6",
-  "pyee>=13.0.0",
   "pylint>=3.3.7",
   "sphinx-autodoc-typehints>=3",
   "sphinxcontrib-mermaid>=1.0.0",

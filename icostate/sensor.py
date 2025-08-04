@@ -59,17 +59,18 @@ class SensorNodeAttributes:
             ...                      mac_address=EUI("12-34-56-78-90-AB"),
             ...                      adc_configuration=config
             ...                     ) # doctest:+NORMALIZE_WHITESPACE
-            Name: hello, MAC Address: 12-34-56-78-90-AB, ADC Configuration: (Get, Prescaler: 2, Acquisition Time: 8, Oversampling Rate: 64, Reference Voltage: 3.3 V, True)
+            Name: hello, MAC Address: 12-34-56-78-90-AB, ADC: 3.3 | 8 | 2 | 64
 
         """
 
         return ", ".join([
             f"Name: {self.name}",
             f"MAC Address: {self.mac_address}",
-            (
-                "ADC Configuration: "
-                f"{self.adc_configuration, True}"
-            ),
+            f"ADC: "
+            f"{self.adc_configuration.reference_voltage} | "
+            f"{self.adc_configuration.acquisition_time} | "        
+            f"{self.adc_configuration.prescaler} | "        
+            f"{self.adc_configuration.oversampling_rate}"
         ])
 
 

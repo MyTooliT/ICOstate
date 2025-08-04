@@ -68,8 +68,8 @@ class SensorNodeAttributes:
             f"MAC Address: {self.mac_address}",
             f"ADC: "
             f"{self.adc_configuration.reference_voltage} | "
-            f"{self.adc_configuration.acquisition_time} | "        
-            f"{self.adc_configuration.prescaler} | "        
+            f"{self.adc_configuration.acquisition_time} | "
+            f"{self.adc_configuration.prescaler} | "
             f"{self.adc_configuration.oversampling_rate}"
         ])
 

@@ -24,17 +24,21 @@ class SensorNodeAttributes:
 
             The MAC address of the sensor node
 
+        adc_configuration:
+
+            The ADC configuration of the sensor node
+
     """
 
     def __init__(
         self,
-        name: str | None = None,
-        mac_address: EUI | None = None,
-        adc_configuration: ADCConfiguration | None = None,
+        name: str,
+        mac_address: EUI,
+        adc_configuration: ADCConfiguration,
     ) -> None:
-        self.name: str | None = name
-        self.mac_address: EUI | None = mac_address
-        self.adc_configuration: ADCConfiguration | None = adc_configuration
+        self.name: str = name
+        self.mac_address: EUI = mac_address
+        self.adc_configuration: ADCConfiguration = adc_configuration
 
     def __repr__(self) -> str:
         """Get the textual representation of the sensor node
@@ -55,35 +59,16 @@ class SensorNodeAttributes:
             ...                      mac_address=EUI("12-34-56-78-90-AB"),
             ...                      adc_configuration=config
             ...                     ) # doctest:+NORMALIZE_WHITESPACE
-            Name: hello,
-            MAC Address: 12-34-56-78-90-AB,
-            ADC Configuration: [Prescaler: 2,
-                                Acquisition Time: 8,
-                                Oversampling Rate: 64,
-                                Reference Voltage: 3.3 V]
-
-            Get representation of a sensor node with defined name
-
-            >>> SensorNodeAttributes(name="hello"
-            ...                     ) # doctest:+NORMALIZE_WHITESPACE
-            Name: hello,
-            MAC Address: Undefined,
-            ADC Configuration: Undefined
+            Name: hello, MAC Address: 12-34-56-78-90-AB, ADC Configuration: (Get, Prescaler: 2, Acquisition Time: 8, Oversampling Rate: 64, Reference Voltage: 3.3 V, True)
 
         """
 
-        def attribute_or_undefined(attribute, brackets: bool = False) -> str:
-            if attribute is None:
-                return "Undefined"
-
-            return f"[{attribute}]" if brackets else str(attribute)
-
         return ", ".join([
-            f"Name: {attribute_or_undefined(self.name)}",
-            f"MAC Address: {attribute_or_undefined(self.mac_address)}",
+            f"Name: {self.name}",
+            f"MAC Address: {self.mac_address}",
             (
                 "ADC Configuration: "
-                f"{attribute_or_undefined(self.adc_configuration, True)}"
+                f"{self.adc_configuration, True}"
             ),
         ])
 

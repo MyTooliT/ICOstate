@@ -331,9 +331,11 @@ class ICOsystem(AsyncIOEventEmitter):
         self.emit("sensor_node_mac_address", mac_address)
         name = await self.sensor_node.get_name()
         self.emit("sensor_node_name", name)
+        adc_configuration = await self.sensor_node.get_adc_configuration()
+        self.emit("sensor_node_adc_configuration", adc_configuration)
 
         self.sensor_node_attributes = SensorNodeAttributes(
-            mac_address=mac_address, name=name
+            mac_address=mac_address, name=name, adc_configuration=adc_configuration
         )
         self.state = State.SENSOR_NODE_CONNECTED
 

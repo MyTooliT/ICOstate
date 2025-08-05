@@ -274,7 +274,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         Raises:
 
-            ArgumentError:
+            ValueError:
 
                 If the specified MAC address is not valid
 
@@ -337,7 +337,7 @@ class ICOsystem(AsyncIOEventEmitter):
         self.sensor_node_attributes = SensorNodeAttributes(
             mac_address=mac_address,
             name=name,
-            adc_configuration=adc_configuration
+            adc_configuration=adc_configuration,
         )
         self.state = State.SENSOR_NODE_CONNECTED
 

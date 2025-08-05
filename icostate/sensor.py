@@ -69,10 +69,11 @@ class SensorNodeAttributes:
 
         """
 
+        adc = str(self.adc_configuration).replace(", ", "\n  ")
         return "\n".join([
             f"Name: {self.name}",
             f"MAC Address: {self.mac_address}",
-            f"ADC:\n  {str(self.adc_configuration).replace(', ', '\n  ')}",
+            f"ADC:\n  {adc}",
         ])
 
 

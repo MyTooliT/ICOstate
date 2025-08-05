@@ -304,6 +304,21 @@ class ICOsystem(AsyncIOEventEmitter):
             Sensor Node Connected
             STU Connected
 
+            Try to connect using an invalid MAC address
+
+            >>> async def try_connect_incorrect_mac(icosystem: ICOsystem):
+            ...     try:
+            ...         await icosystem.connect_stu()
+            ...         await icosystem.connect_sensor_node_mac(
+            ...             "Not a MAC address")
+            ...     finally:
+            ...         await icosystem.disconnect_stu()
+
+            >>> run(try_connect_incorrect_mac(ICOsystem()))
+            Traceback (most recent call last):
+               ...
+            ValueError: “Not a MAC address” is not a valid MAC address:...
+
         """
 
         self._check_state({State.STU_CONNECTED}, "Connecting to sensor device")

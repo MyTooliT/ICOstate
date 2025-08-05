@@ -288,7 +288,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
             >>> from asyncio import run
 
-            Connect to a disconnect from sensor node
+            Connect to and disconnect from sensor node
 
             >>> async def connect_sensor_node(icosystem: ICOsystem,
             ...                               mac_address: str):

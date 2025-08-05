@@ -4,6 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 authors = [
+  {name = "Moritz Breurather", email = "breurather@ift.at"},
   {name = "René Schwaiger", email = "rene.schwaiger@ift.at"},
 ]
 

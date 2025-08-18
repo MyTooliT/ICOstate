@@ -76,7 +76,6 @@ check_untyped_defs = true
 
 [tool.pytest.ini_options]
 # - Use doctests
-# - Fail after first errors
 # - Verbose output
-addopts = "--doctest-modules -x -v"
+addopts = "--doctest-modules -v"
 minversion = "6.0"

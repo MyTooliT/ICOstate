@@ -183,39 +183,6 @@ class ICOsystem(AsyncIOEventEmitter):
 
         assert state == operating
 
-    async def enable_ota(self) -> None:
-        """Enable OTA (Over The Air) update mode
-
-        Raises:
-
-            NoResponseError:
-
-                If there was no response to an request made by this coroutine
-
-        Examples:
-
-            Import necessary code
-
-            >>> from asyncio import run
-
-            Enable OTA update mode
-
-            >>> async def enable_ota(icosystem: ICOsystem):
-            ...     await icosystem.connect_stu()
-            ...     await icosystem.enable_ota()
-            ...     await icosystem.disconnect_stu()
-            >>> run(enable_ota(ICOsystem()))
-
-        """
-
-        self._check_state({State.STU_CONNECTED}, "Enabling OTA mode")
-
-        assert isinstance(self.stu, STU)
-
-        # The coroutine below activates the advertisement required for the
-        # Over The Air (OTA) firmware update.
-        await self.stu.activate_bluetooth()
-
     async def collect_sensor_nodes(self) -> list[SensorNodeInfo]:
         """Get available sensor nodes
 

@@ -45,10 +45,10 @@ async def test_connect(sensor_node_mac_address, sensor_node_name):
 
 
 @mark.asyncio
-async def test_rename(sensor_node_mac_address, sensor_node_name):
+async def test_rename(connect_stu, sensor_node_mac_address, sensor_node_name):
     """Test sensor renaming"""
 
-    icosystem = ICOsystem()
+    icosystem = connect_stu
     name_event_triggered = False
 
     @icosystem.on("sensor_node_name")
@@ -57,18 +57,16 @@ async def test_rename(sensor_node_mac_address, sensor_node_name):
         nonlocal name_event_triggered
         name_event_triggered = True
 
-    await icosystem.connect_stu()
     await icosystem.rename(sensor_node_name, str(sensor_node_mac_address))
     await sleep(0)  # Allow scheduler to trigger event coroutines
     assert name_event_triggered is True
-    await icosystem.disconnect_stu()
 
 
 @mark.asyncio
-async def test_adc_get(sensor_node_mac_address):
+async def test_adc_get(connect_stu, sensor_node_mac_address):
     """Test ADC get coroutine"""
 
-    icosystem = ICOsystem()
+    icosystem = connect_stu
     adc_event_triggered = False
 
     @icosystem.on("sensor_node_adc_configuration")
@@ -77,20 +75,18 @@ async def test_adc_get(sensor_node_mac_address):
         nonlocal adc_event_triggered
         adc_event_triggered = True
 
-    await icosystem.connect_stu()
     await icosystem.connect_sensor_node_mac(sensor_node_mac_address)
     await icosystem.get_adc_configuration()
     await sleep(0)  # Allow scheduler to trigger event coroutines
     assert adc_event_triggered is True
     await icosystem.disconnect_sensor_node()
-    await icosystem.disconnect_stu()
 
 
 @mark.asyncio
-async def test_adc_set(sensor_node_mac_address):
+async def test_adc_set(connect_stu, sensor_node_mac_address):
     """Test ADC set coroutine"""
 
-    icosystem = ICOsystem()
+    icosystem = connect_stu
     adc_event_triggered = 0
 
     @icosystem.on("sensor_node_adc_configuration")
@@ -100,7 +96,6 @@ async def test_adc_set(sensor_node_mac_address):
         adc_event_triggered += 1
 
     # Connect
-    await icosystem.connect_stu()
     await icosystem.connect_sensor_node_mac(sensor_node_mac_address)
     await sleep(0)  # Allow scheduler to trigger event coroutines
     assert adc_event_triggered == 1
@@ -131,4 +126,3 @@ async def test_adc_set(sensor_node_mac_address):
 
     # Disconnect
     await icosystem.disconnect_sensor_node()
-    await icosystem.disconnect_stu()

@@ -45,21 +45,41 @@ async def test_connect(sensor_node_mac_address, sensor_node_name):
 
 
 @mark.asyncio
-async def test_rename(connect_stu, sensor_node_mac_address, sensor_node_name):
+async def test_rename_disconnected(
+    connect_stu, sensor_node_mac_address, sensor_node_name
+):
     """Test sensor renaming"""
 
     icosystem = connect_stu
-    name_event_triggered = False
+    name_event_triggered = 0
+    mac_address = str(sensor_node_mac_address)
+    current_sensor_name = None
 
     @icosystem.on("sensor_node_name")
     async def name_changed(name: str):
-        assert isinstance(name, str)
+        nonlocal current_sensor_name
         nonlocal name_event_triggered
-        name_event_triggered = True
 
-    await icosystem.rename(sensor_node_name, str(sensor_node_mac_address))
+        assert isinstance(name, str)
+        assert len(name) <= 8
+        current_sensor_name = name
+        name_event_triggered += 1
+
     await sleep(0)  # Allow scheduler to trigger event coroutines
-    assert name_event_triggered is True
+    assert name_event_triggered == 0
+    name_between = "ReNaMeD"
+
+    await icosystem.rename(name_between, mac_address)
+    await sleep(0)  # Allow scheduler to trigger event coroutines
+    # Triggered twice, since rename coroutine sets name when it connects to
+    # sensor node before renaming
+    assert name_event_triggered == 2
+    assert current_sensor_name == name_between
+
+    await icosystem.rename(sensor_node_name, mac_address)
+    await sleep(0)  # Allow scheduler to trigger event coroutines
+    assert name_event_triggered == 4
+    assert current_sensor_name == sensor_node_name
 
 
 @mark.asyncio

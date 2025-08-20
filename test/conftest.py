@@ -36,3 +36,14 @@ async def connect_stu():
     await icosystem.connect_stu()
     yield icosystem
     await icosystem.disconnect_stu()
+
+
+@fixture
+async def connect_sensor_node(connect_stu, sensor_node_mac_address):
+    """Connect to and disconnect from sensor node"""
+
+    icosystem = connect_stu
+
+    await icosystem.connect_sensor_node_mac(sensor_node_mac_address)
+    yield icosystem
+    await icosystem.disconnect_sensor_node()

@@ -79,3 +79,4 @@ check_untyped_defs = true
 # - Verbose output
 addopts = "--doctest-modules -v"
 minversion = "6.0"
+asyncio_mode = "auto"

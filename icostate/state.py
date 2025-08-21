@@ -28,6 +28,7 @@ class State(str, Enum):
     DISCONNECTED = "DISCONNECTED"
     STU_CONNECTED = "STU_CONNECTED"
     SENSOR_NODE_CONNECTED = "SENSOR_NODE_CONNECTED"
+    MEASUREMENT = "MEASUREMENT"
 
     def __str__(self) -> str:
         """Get informal string representation of state

@@ -1,25 +1,95 @@
 """Application Programming Interface for stateful access to ICOtronic system"""
 
-# pylint: disable=too-few-public-methods
-
 # -- Imports ------------------------------------------------------------------
 
-from asyncio import sleep
+from asyncio import create_task, sleep, Task
+from logging import getLogger
+from typing import Any
 
-from netaddr import AddrFormatError, EUI
-from pyee.asyncio import AsyncIOEventEmitter
-
-from icotronic.can import Connection, STU
+from icotronic.can import Connection, StreamingConfiguration, STU
 from icotronic.can.adc import ADCConfiguration
 from icotronic.can.node.sensor import SensorNode
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
+from netaddr import AddrFormatError, EUI
+from pyee.asyncio import AsyncIOEventEmitter
 
 from icostate.sensor import SensorNodeAttributes
 from icostate.error import IncorrectStateError
 from icostate.state import State
 
 # -- Classes ------------------------------------------------------------------
+
+
+class Measurement:
+    """Collect measurement data
+
+    Args:
+
+        icosystem:
+
+            ICOsystem class that should be used to measure data
+
+    """
+
+    def __init__(self, icosystem) -> None:
+
+        self.icosystem = icosystem
+        self.read_task: Task[Any] | None = None
+        self.logger = getLogger()
+
+    def start(self, configuration: StreamingConfiguration) -> None:
+        """Start the measurement
+
+        Args:
+
+            configuration:
+
+                The streaming configuration that should be used for the
+                measurement
+
+        """
+
+        if self.read_task is not None:
+            self.logger.info("Stopping old measurement task")
+            self.stop()
+
+        self.logger.info("Creating new measurement task")
+        self.read_task = create_task(self._read(configuration))
+
+    def stop(self):
+        """Stop the current measurement"""
+
+        if self.read_task is not None:
+            self.read_task.cancel()
+        self.read_task = None
+
+    async def _read(self, configuration: StreamingConfiguration):
+        """Task for collecting measurement data
+
+        configuration:
+
+            The streaming configuration that should be used for the
+            measurement
+
+        """
+
+        collected_data = []
+
+        async with self.icosystem.sensor_node.open_data_stream(
+            configuration
+        ) as stream:
+            self.logger.info(
+                "Opened stream with configuration: %s", configuration
+            )
+
+            async for data, _ in stream:
+                collected_data.extend(data.values)
+                if len(collected_data) >= 1000:
+                    self.icosystem.emit(
+                        "sensor_node_streaming_data", collected_data
+                    )
+                    collected_data = []
 
 
 class ICOsystem(AsyncIOEventEmitter):
@@ -45,6 +115,8 @@ class ICOsystem(AsyncIOEventEmitter):
         self.stu: STU | None = None
         self.sensor_node_connection: AsyncSensorNodeManager | None = None
         self.sensor_node: SensorNode = None
+
+        self.measurement = Measurement(self)
 
         self.sensor_node_attributes: SensorNodeAttributes | None = None
         """Information about currently connected sensor node"""
@@ -724,6 +796,37 @@ class ICOsystem(AsyncIOEventEmitter):
 
         if disconnect_after:
             await self.disconnect_sensor_node()
+
+    async def start_measurement(
+        self, configuration: StreamingConfiguration
+    ) -> None:
+        """Start Measurement
+
+        Args:
+
+            configuration:
+
+                The streaming configuration that should be used for the
+                measurement
+
+        """
+
+        self._check_state(
+            {State.SENSOR_NODE_CONNECTED}, "Starting measurement"
+        )
+
+        self.measurement.start(configuration)
+
+        self.state = State.MEASUREMENT
+
+    async def stop_measurement(self) -> None:
+        """Stop measurement"""
+
+        self._check_state({State.MEASUREMENT}, "Stopping measurement")
+
+        self.measurement.stop()
+
+        self.state = State.SENSOR_NODE_CONNECTED
 
 
 if __name__ == "__main__":

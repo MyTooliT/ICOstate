@@ -15,6 +15,7 @@ State Diagram
        disconnected: Disconnected
        stu_connected: STU Connected
        sensor_node_connected: Sensor Node Connected
+       measurement: Measurement
 
        disconnected --> stu_connected: connect_stu
 
@@ -22,8 +23,12 @@ State Diagram
        stu_connected --> stu_connected: collect_sensor_nodes, get_adc_configuration, rename, reset, set_adc_configuration
        stu_connected --> sensor_node_connected: connect_sensor_node_mac
 
-       sensor_node_connected --> sensor_node_connected: get_adc_configuration, rename, set_adc_configuration
        sensor_node_connected --> stu_connected: disconnect_sensor_node
+       sensor_node_connected --> sensor_node_connected: get_adc_configuration, rename, set_adc_configuration
+       sensor_node_connected --> measurement: start_measurement
+
+       measurement --> sensor_node_connected: stop_measurement
+
 
 In addition to coroutines that label the edges of the `state diagram <#state-diagram>`_ above you can also use the coroutine :meth:`ICOsystem.is_sensor_node_connected`, which works in any state.
 
@@ -159,6 +164,7 @@ Objects of the :class:`ICOsystem` provides an event based API (based on `pyee`_)
 - ``sensor_node_name``: Called when the name of the current sensor node changes
 - ``sensor_node_mac_address``: Called when the MAC address of a sensor node changes
 - ``sensor_node_adc_configuration``: Called when the ADC configuration of a sensor node is updated
+- ``sensor_node_streaming_data``: Called when new streaming data is available
 
 .. _pyee: https://pyee.readthedocs.io
 

@@ -3,8 +3,11 @@
 # -- Imports ------------------------------------------------------------------
 
 from asyncio import sleep
+from math import isclose
+from statistics import mean
 
 from icotronic.can.adc import ADCConfiguration
+from icotronic.can import StreamingConfiguration
 from netaddr import EUI
 from pytest import mark
 
@@ -136,3 +139,34 @@ async def test_adc_set(connect_sensor_node):
     await sleep(0)  # Allow scheduler to trigger event coroutines
     assert adc_event_triggered == 4
     assert adc_config == default_adc_config
+
+
+@mark.asyncio
+async def test_measurement(connect_sensor_node):
+    """Test measurement coroutines"""
+
+    icosystem = connect_sensor_node
+    collected_data = []
+
+    @icosystem.on("sensor_node_streaming_data")
+    async def streaming_data_changed(streaming_data: list[float]):
+        assert isinstance(streaming_data, list)
+        collected_data.extend(streaming_data)
+
+    streaming_configuration = StreamingConfiguration(
+        first=True, second=False, third=False
+    )
+    await icosystem.start_measurement(streaming_configuration)
+    while len(collected_data) < 10000:
+        await sleep(0.1)
+
+    await icosystem.stop_measurement()
+    assert len(collected_data) >= 10000
+    average = mean(collected_data)
+    approx_zero_g_absolute = 2**15
+    approx_four_g_relative_100g_sensor = 4 * 2**16 / 200
+    assert isclose(
+        average,
+        approx_zero_g_absolute,
+        rel_tol=approx_four_g_relative_100g_sensor,
+    )

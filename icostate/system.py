@@ -2,6 +2,8 @@
 
 # -- Imports ------------------------------------------------------------------
 
+from __future__ import annotations
+
 from asyncio import create_task, sleep, Task
 from logging import getLogger
 from typing import Any
@@ -32,7 +34,12 @@ class Measurement:
 
     """
 
-    def __init__(self, icosystem) -> None:
+    def __init__(
+        # pylint: disable=undefined-variable
+        self,
+        icosystem: ICOSystem,  # type: ignore[name-defined] # noqa: F821
+        # pylint: enable=undefined-variable
+    ) -> None:
 
         self.icosystem = icosystem
         self.read_task: Task[Any] | None = None

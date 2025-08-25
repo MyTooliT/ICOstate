@@ -164,7 +164,7 @@ Objects of the :class:`ICOsystem` provides an event based API (based on `pyee`_)
 - ``sensor_node_name``: Called when the name of the current sensor node changes
 - ``sensor_node_mac_address``: Called when the MAC address of a sensor node changes
 - ``sensor_node_adc_configuration``: Called when the ADC configuration of a sensor node is updated
-- ``sensor_node_streaming_data``: Called when new streaming data is available
+- ``sensor_node_measurement_data``: Called when new streaming data is available
 
 .. _pyee: https://pyee.readthedocs.io
 

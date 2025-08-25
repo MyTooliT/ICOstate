@@ -17,8 +17,9 @@ from icotronic.can.status import State as NodeState
 from netaddr import AddrFormatError, EUI
 from pyee.asyncio import AsyncIOEventEmitter
 
-from icostate.sensor import SensorNodeAttributes
+from icostate.measurement import MeasurementData
 from icostate.error import IncorrectStateError
+from icostate.sensor import SensorNodeAttributes
 from icostate.state import State
 
 # -- Classes ------------------------------------------------------------------
@@ -33,29 +34,19 @@ class Measurement:
 
             ICOsystem class that should be used to measure data
 
-        update_rate:
-
-            The measurement update rate in Hz, i.e. how many times in
-            a second ``icosystem`` emits the ``sensor_node_streaming_data``
-            event.
-
     """
 
-    def __init__(
-        # pylint: disable=undefined-variable
-        self,
-        icosystem: ICOSystem,  # type: ignore[name-defined] # noqa: F821
-        # pylint: enable=undefined-variable
-        update_rate: float = 60,
-    ) -> None:
+    def __init__(self, icosystem: ICOsystem) -> None:
 
         self.icosystem = icosystem
         self.read_task: Task[Any] | None = None
         self.logger = getLogger()
-        self.update_rate = update_rate
+        self.update_rate = 60.0  # Sensible default of 60 Hz
         """Measurement update rate in Hz"""
 
-    def start(self, configuration: StreamingConfiguration) -> None:
+    def start(
+        self, configuration: StreamingConfiguration, update_rate: float
+    ) -> None:
         """Start the measurement
 
         Args:
@@ -65,7 +56,15 @@ class Measurement:
                 The streaming configuration that should be used for the
                 measurement
 
+            update_rate:
+
+                The measurement update rate in Hz, i.e. how many times in
+                a second ``icosystem`` emits the
+                ``sensor_node_measurement_data`` event.
+
         """
+
+        self.update_rate = update_rate
 
         if self.read_task is not None:
             self.logger.info("Stopping old measurement task")
@@ -100,16 +99,16 @@ class Measurement:
 
             start = monotonic()
             period = 1 / self.update_rate
-            collected_data = []
+            collected_data = MeasurementData(configuration)
             async for data, _ in stream:
-                collected_data.extend(data.values)
+                collected_data.append(data)
                 current = monotonic()
                 if current - start >= period:
                     self.icosystem.emit(
-                        "sensor_node_streaming_data", collected_data
+                        "sensor_node_measurement_data", collected_data
                     )
                     start = current
-                    collected_data = []
+                    collected_data = MeasurementData(configuration)
 
 
 class ICOsystem(AsyncIOEventEmitter):
@@ -818,7 +817,7 @@ class ICOsystem(AsyncIOEventEmitter):
             await self.disconnect_sensor_node()
 
     async def start_measurement(
-        self, configuration: StreamingConfiguration
+        self, configuration: StreamingConfiguration, update_rate: float = 60
     ) -> None:
         """Start Measurement
 
@@ -829,13 +828,19 @@ class ICOsystem(AsyncIOEventEmitter):
                 The streaming configuration that should be used for the
                 measurement
 
+            update_rate:
+
+                The measurement update rate in Hz, i.e. how many times in
+                a second ``icosystem`` emits the
+                ``sensor_node_measurement_data`` event.
+
         """
 
         self._check_state(
             {State.SENSOR_NODE_CONNECTED}, "Starting measurement"
         )
 
-        self.measurement.start(configuration)
+        self.measurement.start(configuration, update_rate)
 
         self.state = State.MEASUREMENT
 

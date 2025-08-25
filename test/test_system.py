@@ -12,6 +12,7 @@ from icotronic.can import StreamingConfiguration
 from netaddr import EUI
 from pytest import mark
 
+from icostate.measurement import MeasurementData
 from icostate.system import ICOsystem
 
 # -- Functions ----------------------------------------------------------------
@@ -150,13 +151,13 @@ async def test_measurement(connect_sensor_node):
     collected_data: list[float] = []
     start = None
 
-    @icosystem.on("sensor_node_streaming_data")
-    async def streaming_data_changed(streaming_data: list[float]):
+    @icosystem.on("sensor_node_measurement_data")
+    async def measurement_data_changed(measurement_data: MeasurementData):
         nonlocal start
         if start is None:
             start = monotonic()
-        assert isinstance(streaming_data, list)
-        collected_data.extend(streaming_data)
+        assert isinstance(measurement_data, MeasurementData)
+        collected_data.extend(measurement_data.first().values)
 
     streaming_configuration = StreamingConfiguration(
         first=True, second=False, third=False

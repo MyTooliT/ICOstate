@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from asyncio import create_task, sleep, Task
 from logging import getLogger
+from time import monotonic
 from typing import Any
 
 from icotronic.can import Connection, StreamingConfiguration, STU
@@ -81,8 +82,6 @@ class Measurement:
 
         """
 
-        collected_data = []
-
         async with self.icosystem.sensor_node.open_data_stream(
             configuration
         ) as stream:
@@ -90,12 +89,17 @@ class Measurement:
                 "Opened stream with configuration: %s", configuration
             )
 
+            start = monotonic()
+            period = 1 / 60  # 60 Hz
+            collected_data = []
             async for data, _ in stream:
                 collected_data.extend(data.values)
-                if len(collected_data) >= 1000:
+                current = monotonic()
+                if current - start >= period:
                     self.icosystem.emit(
                         "sensor_node_streaming_data", collected_data
                     )
+                    start = current
                     collected_data = []
 
 

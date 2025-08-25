@@ -5,6 +5,7 @@
 from asyncio import sleep
 from math import isclose
 from statistics import mean
+from time import monotonic
 
 from icotronic.can.adc import ADCConfiguration
 from icotronic.can import StreamingConfiguration
@@ -146,22 +147,31 @@ async def test_measurement(connect_sensor_node):
     """Test measurement coroutines"""
 
     icosystem = connect_sensor_node
-    collected_data = []
+    collected_data: list[float] = []
+    start = None
 
     @icosystem.on("sensor_node_streaming_data")
     async def streaming_data_changed(streaming_data: list[float]):
+        nonlocal start
+        if start is None:
+            start = monotonic()
         assert isinstance(streaming_data, list)
         collected_data.extend(streaming_data)
 
     streaming_configuration = StreamingConfiguration(
         first=True, second=False, third=False
     )
+    sample_rate = (await icosystem.get_adc_configuration()).sample_rate()
     await icosystem.start_measurement(streaming_configuration)
-    while len(collected_data) < 10000:
-        await sleep(0.1)
+    while len(collected_data) < sample_rate:
+        await sleep(0.01)
+    assert isinstance(start, float)
+    collection_time = monotonic() - start
+
+    assert 0.9 <= collection_time <= 1.3
 
     await icosystem.stop_measurement()
-    assert len(collected_data) >= 10000
+    assert len(collected_data) >= sample_rate
     average = mean(collected_data)
     approx_zero_g_absolute = 2**15
     approx_four_g_relative_100g_sensor = 4 * 2**16 / 200

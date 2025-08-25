@@ -33,6 +33,12 @@ class Measurement:
 
             ICOsystem class that should be used to measure data
 
+        update_rate:
+
+            The measurement update rate in Hz, i.e. how many times in
+            a second ``icosystem`` emits the ``sensor_node_streaming_data``
+            event.
+
     """
 
     def __init__(
@@ -40,11 +46,14 @@ class Measurement:
         self,
         icosystem: ICOSystem,  # type: ignore[name-defined] # noqa: F821
         # pylint: enable=undefined-variable
+        update_rate: float = 60,
     ) -> None:
 
         self.icosystem = icosystem
         self.read_task: Task[Any] | None = None
         self.logger = getLogger()
+        self.update_rate = update_rate
+        """Measurement update rate in Hz"""
 
     def start(self, configuration: StreamingConfiguration) -> None:
         """Start the measurement
@@ -90,7 +99,7 @@ class Measurement:
             )
 
             start = monotonic()
-            period = 1 / 60  # 60 Hz
+            period = 1 / self.update_rate
             collected_data = []
             async for data, _ in stream:
                 collected_data.extend(data.values)

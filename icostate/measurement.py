@@ -94,7 +94,7 @@ class MeasurementData:
 
     """
 
-    def __init__(self, configuration: StreamingConfiguration):
+    def __init__(self, configuration: StreamingConfiguration) -> None:
         self.configuration = configuration
         self.streaming_data: list[StreamingData] = []
 
@@ -330,7 +330,7 @@ class MeasurementData:
 
         return channel_data
 
-    def append(self, data: StreamingData):
+    def append(self, data: StreamingData) -> None:
         """Append some streaming data to the measurement
 
         Args:

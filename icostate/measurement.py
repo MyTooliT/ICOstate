@@ -96,7 +96,41 @@ class MeasurementData:
 
     def __init__(self, configuration: StreamingConfiguration) -> None:
         self.configuration = configuration
-        self.streaming_data: list[StreamingData] = []
+        self.streaming_data_list: list[StreamingData] = []
+
+    def __repr__(self) -> str:
+        """Get the textual representation of the measurement data
+
+        Returns:
+
+            The textual representation of the measurement data
+
+        Examples:
+
+            >>> config = StreamingConfiguration(first=True, second=True,
+            ...                                 third=False)
+            >>> data = MeasurementData(config)
+            >>> s1 = StreamingData(values=[1, 2], counter=255,
+            ...                    timestamp=1756125747.528234)
+            >>> s2 = StreamingData(values=[3, 4], counter=0,
+            ...                    timestamp=1756125747.528237)
+            >>> data.append(s1)
+
+            >>> data
+            Channel 1 enabled, Channel 2 enabled, Channel 3 disabled
+            [1, 2]@1756125747.528234 #255
+
+            >>> data.append(s2)
+            >>> data
+            Channel 1 enabled, Channel 2 enabled, Channel 3 disabled
+            [1, 2]@1756125747.528234 #255
+            [3, 4]@1756125747.528237 #0
+
+        """
+
+        return f"{self.configuration}\n" + "\n".join([
+            str(streaming_data) for streaming_data in self.streaming_data_list
+        ])
 
     def first(self) -> ChannelData:
         """Get all data of the first measurement channel
@@ -158,7 +192,7 @@ class MeasurementData:
         if configuration.first:
             if not configuration.second and not configuration.third:
                 # Three values
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     for _ in range(3):
                         channel_data.counters.append(streaming_data.counter)
                         channel_data.timestamps.append(
@@ -167,7 +201,7 @@ class MeasurementData:
                     channel_data.values.extend(streaming_data.values)
             else:
                 # One value
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     channel_data.counters.append(streaming_data.counter)
                     channel_data.timestamps.append(streaming_data.timestamp)
                     channel_data.values.append(streaming_data.values[0])
@@ -234,7 +268,7 @@ class MeasurementData:
         if configuration.second:
             if not configuration.first and not configuration.third:
                 # Three values
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     for _ in range(3):
                         channel_data.counters.append(streaming_data.counter)
                         channel_data.timestamps.append(
@@ -243,7 +277,7 @@ class MeasurementData:
                     channel_data.values.extend(streaming_data.values)
             else:
                 # One value
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     channel_data.counters.append(streaming_data.counter)
                     channel_data.timestamps.append(streaming_data.timestamp)
                     channel_data.values.append(
@@ -314,7 +348,7 @@ class MeasurementData:
         if configuration.third:
             if not configuration.first and not configuration.second:
                 # Three values
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     for _ in range(3):
                         channel_data.counters.append(streaming_data.counter)
                         channel_data.timestamps.append(
@@ -323,7 +357,7 @@ class MeasurementData:
                     channel_data.values.extend(streaming_data.values)
             else:
                 # One value
-                for streaming_data in self.streaming_data:
+                for streaming_data in self.streaming_data_list:
                     channel_data.counters.append(streaming_data.counter)
                     channel_data.timestamps.append(streaming_data.timestamp)
                     channel_data.values.append(streaming_data.values[-1])
@@ -341,7 +375,59 @@ class MeasurementData:
 
         """
 
-        self.streaming_data.append(data)
+        self.streaming_data_list.append(data)
+
+    def extend(self, data: MeasurementData) -> None:
+        """Extend this measurement data with some other measurement data
+
+        Args:
+
+            data:
+
+                The measurement data that should be added to this measurement
+
+        Examples:
+
+            Extend measurement data with other measurement data
+
+            >>> config = StreamingConfiguration(first=True, second=False,
+            ...                                 third=True)
+            >>> data1 = MeasurementData(config)
+            >>> s1 = StreamingData(values=[1, 2], counter=255,
+            ...                    timestamp=1756125747.528234)
+            >>> s2 = StreamingData(values=[3, 4], counter=0,
+            ...                    timestamp=1756125747.528237)
+            >>> data1.append(s1)
+            >>> data1.append(s2)
+            >>> data1
+            Channel 1 enabled, Channel 2 disabled, Channel 3 enabled
+            [1, 2]@1756125747.528234 #255
+            [3, 4]@1756125747.528237 #0
+
+            >>> data2 = MeasurementData(config)
+            >>> s3 = StreamingData(values=[10, 20], counter=1,
+            ...                    timestamp=1756125747.678912)
+            >>> data2.append(s3)
+            >>> data2
+            Channel 1 enabled, Channel 2 disabled, Channel 3 enabled
+            [10, 20]@1756125747.678912 #1
+
+            >>> data1.extend(data2)
+            >>> data1
+            Channel 1 enabled, Channel 2 disabled, Channel 3 enabled
+            [1, 2]@1756125747.528234 #255
+            [3, 4]@1756125747.528237 #0
+            [10, 20]@1756125747.678912 #1
+
+        """
+
+        if self.configuration != data.configuration:
+            raise ValueError(
+                f"Trying to merge measurement data {self.configuration} with "
+                "different streaming configuration: {data.configuration}"
+            )
+
+        self.streaming_data_list.extend(data.streaming_data_list)
 
 
 if __name__ == "__main__":

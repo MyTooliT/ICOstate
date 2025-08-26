@@ -60,23 +60,21 @@ class ChannelData:
             ...                    values = [4, 5, 6, 7, 8, 9])
 
             >>> data # doctest:+NORMALIZE_WHITESPACE
-            [4@1756124450.256398 (1),
-             5@1756124450.256398 (1),
-             6@1756124450.256398 (1),
-             7@1756124450.2564 (2),
-             8@1756124450.2564 (2),
-             9@1756124450.2564 (2)]
+            4@1756124450.256398 #1
+            5@1756124450.256398 #1
+            6@1756124450.256398 #1
+            7@1756124450.2564 #2
+            8@1756124450.2564 #2
+            9@1756124450.2564 #2
 
         """
 
-        elements = ", ".join([
-            f"{value}@{timestamp} ({counter})"
+        return "\n".join([
+            f"{value}@{timestamp} #{counter}"
             for counter, timestamp, value in zip(
                 self.counters, self.timestamps, self.values
             )
         ])
-
-        return f"[{elements}]"
 
 
 # pylint: enable=too-few-public-methods
@@ -128,9 +126,14 @@ class MeasurementData:
 
         """
 
-        return f"{self.configuration}\n" + "\n".join([
-            str(streaming_data) for streaming_data in self.streaming_data_list
-        ])
+        return (
+            f"{self.configuration}"
+            + ("\n" if self.streaming_data_list else "")
+            + "\n".join([
+                str(streaming_data)
+                for streaming_data in self.streaming_data_list
+            ])
+        )
 
     def first(self) -> ChannelData:
         """Get all data of the first measurement channel
@@ -153,13 +156,13 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756125747.528234 (255),
-             3@1756125747.528237 (0)]
+            1@1756125747.528234 #255
+            3@1756125747.528237 #0
             >>> data.second() # doctest:+NORMALIZE_WHITESPACE
-            [2@1756125747.528234 (255),
-             4@1756125747.528237 (0)]
+            2@1756125747.528234 #255
+            4@1756125747.528237 #0
             >>> data.third()
-            []
+            <BLANKLINE>
 
             Get first channel data of measurement with one enabled channel
 
@@ -173,16 +176,16 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756126628.820695 (10),
-             2@1756126628.820695 (10),
-             3@1756126628.820695 (10),
-             4@1756126628.8207 (20),
-             5@1756126628.8207 (20),
-             6@1756126628.8207 (20)]
+            1@1756126628.820695 #10
+            2@1756126628.820695 #10
+            3@1756126628.820695 #10
+            4@1756126628.8207 #20
+            5@1756126628.8207 #20
+            6@1756126628.8207 #20
             >>> data.second()
-            []
+            <BLANKLINE>
             >>> data.third()
-            []
+            <BLANKLINE>
 
         """
 
@@ -229,13 +232,13 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first()
-            []
+            <BLANKLINE>
             >>> data.second() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756125747.528234 (255),
-             3@1756125747.528237 (0)]
+            1@1756125747.528234 #255
+            3@1756125747.528237 #0
             >>> data.third() # doctest:+NORMALIZE_WHITESPACE
-            [2@1756125747.528234 (255),
-             4@1756125747.528237 (0)]
+            2@1756125747.528234 #255
+            4@1756125747.528237 #0
 
             Get second channel data of measurement with one enabled channel
 
@@ -249,16 +252,16 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first()
-            []
+            <BLANKLINE>
             >>> data.second() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756126628.820695 (10),
-             2@1756126628.820695 (10),
-             3@1756126628.820695 (10),
-             4@1756126628.8207 (20),
-             5@1756126628.8207 (20),
-             6@1756126628.8207 (20)]
+            1@1756126628.820695 #10
+            2@1756126628.820695 #10
+            3@1756126628.820695 #10
+            4@1756126628.8207 #20
+            5@1756126628.8207 #20
+            6@1756126628.8207 #20
             >>> data.third()
-            []
+            <BLANKLINE>
 
         """
 
@@ -309,13 +312,13 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756125747.528234 (255),
-             3@1756125747.528237 (0)]
+            1@1756125747.528234 #255
+            3@1756125747.528237 #0
             >>> data.second()
-            []
+            <BLANKLINE>
             >>> data.third() # doctest:+NORMALIZE_WHITESPACE
-            [2@1756125747.528234 (255),
-             4@1756125747.528237 (0)]
+            2@1756125747.528234 #255
+            4@1756125747.528237 #0
 
             Get third channel data of measurement with one enabled channel
 
@@ -329,16 +332,16 @@ class MeasurementData:
             >>> data.append(s1)
             >>> data.append(s2)
             >>> data.first()
-            []
+            <BLANKLINE>
             >>> data.second()
-            []
+            <BLANKLINE>
             >>> data.third() # doctest:+NORMALIZE_WHITESPACE
-            [1@1756126628.820695 (10),
-             2@1756126628.820695 (10),
-             3@1756126628.820695 (10),
-             4@1756126628.8207 (20),
-             5@1756126628.8207 (20),
-             6@1756126628.8207 (20)]
+            1@1756126628.820695 #10
+            2@1756126628.820695 #10
+            3@1756126628.820695 #10
+            4@1756126628.8207 #20
+            5@1756126628.8207 #20
+            6@1756126628.8207 #20
 
         """
 
@@ -380,15 +383,15 @@ class MeasurementData:
             >>> config = StreamingConfiguration(first=True, second=True,
             ...                                 third=True)
             >>> data = MeasurementData(config)
-            >>> s1 = StreamingData(values=[4, 5, 3], counter=15,
-            ...                    timestamp=1756197008.776551)
-            >>> s1
+            >>> data
             Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
 
+            >>> s1 = StreamingData(values=[4, 5, 3], counter=15,
+            ...                    timestamp=1756197008.776551)
             >>> data.append(s1)
             >>> data
             Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
-            [4, 5, 3]@1756125747.528234 #255
+            [4, 5, 3]@1756197008.776551 #15
 
         """
 

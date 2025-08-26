@@ -373,6 +373,23 @@ class MeasurementData:
 
                 The streaming data that should be added to the measurement
 
+        Examples:
+
+            Append some streaming data to a measurement
+
+            >>> config = StreamingConfiguration(first=True, second=True,
+            ...                                 third=True)
+            >>> data = MeasurementData(config)
+            >>> s1 = StreamingData(values=[4, 5, 3], counter=15,
+            ...                    timestamp=1756197008.776551)
+            >>> s1
+            Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
+
+            >>> data.append(s1)
+            >>> data
+            Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
+            [4, 5, 3]@1756125747.528234 #255
+
         """
 
         self.streaming_data_list.append(data)

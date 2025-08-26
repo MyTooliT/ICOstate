@@ -135,6 +135,40 @@ class MeasurementData:
             ])
         )
 
+    def __len__(self) -> int:
+        """Get the length of the measurement data
+
+        The length is defined as the number of streaming data items contained
+        in the measurement data.
+
+        Returns:
+
+            The number of streaming data elements in the measurement data
+
+        Examples:
+
+            >>> config = StreamingConfiguration(first=True, second=True,
+            ...                                 third=False)
+            >>> data = MeasurementData(config)
+            >>> len(data)
+            0
+
+            >>> s1 = StreamingData(values=[1, 2], counter=255,
+            ...                    timestamp=1756125747.528234)
+            >>> data.append(s1)
+            >>> len(data)
+            1
+
+            >>> s2 = StreamingData(values=[3, 4], counter=0,
+            ...                    timestamp=1756125747.528237)
+            >>> data.append(s2)
+            >>> len(data)
+            2
+
+        """
+
+        return len(self.streaming_data_list)
+
     def first(self) -> ChannelData:
         """Get all data of the first measurement channel
 

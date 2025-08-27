@@ -171,8 +171,9 @@ async def test_measurement(connect_sensor_node):
 
     assert isinstance(start, float)
     collection_time = monotonic() - start
-
     assert 0.9 <= collection_time <= 1.3
+
+    assert collected_data.dataloss() < 0.01
 
     assert len(collected_data) * values_per_message >= sample_rate
     average = mean(collected_data.first().values)

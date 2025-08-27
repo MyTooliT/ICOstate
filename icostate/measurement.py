@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from icotronic.can import StreamingConfiguration, StreamingData
+from icotronic.can.dataloss import calculate_dataloss_stats
 
 # -- Classes ------------------------------------------------------------------
 
@@ -400,6 +401,21 @@ class MeasurementData:
                     channel_data.values.append(streaming_data.values[-1])
 
         return channel_data
+
+    def dataloss(self) -> float:
+        """Get measurement dataloss based on message counters
+
+        Returns:
+
+            The overall amount of dataloss as number between 0 (no data loss)
+            and 1 (all data lost).
+
+        """
+
+        return calculate_dataloss_stats((
+            streaming_data.counter
+            for streaming_data in self.streaming_data_list
+        )).dataloss()
 
     def append(self, data: StreamingData) -> None:
         """Append some streaming data to the measurement

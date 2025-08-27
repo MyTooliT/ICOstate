@@ -167,12 +167,13 @@ async def test_measurement(connect_sensor_node):
     values_per_message = 3
     while len(collected_data) * values_per_message < sample_rate:
         await sleep(0.01)
+    await icosystem.stop_measurement()
+
     assert isinstance(start, float)
     collection_time = monotonic() - start
 
     assert 0.9 <= collection_time <= 1.3
 
-    await icosystem.stop_measurement()
     assert len(collected_data) * values_per_message >= sample_rate
     average = mean(collected_data.first().values)
     approx_zero_g_absolute = 2**15

@@ -148,7 +148,10 @@ async def test_measurement(connect_sensor_node):
     """Test measurement coroutines"""
 
     icosystem = connect_sensor_node
-    collected_data: list[float] = []
+    streaming_configuration = StreamingConfiguration(
+        first=True, second=False, third=False
+    )
+    collected_data = MeasurementData(streaming_configuration)
     start = None
 
     @icosystem.on("sensor_node_measurement_data")
@@ -157,14 +160,12 @@ async def test_measurement(connect_sensor_node):
         if start is None:
             start = monotonic()
         assert isinstance(measurement_data, MeasurementData)
-        collected_data.extend(measurement_data.first().values)
+        collected_data.extend(measurement_data)
 
-    streaming_configuration = StreamingConfiguration(
-        first=True, second=False, third=False
-    )
     sample_rate = (await icosystem.get_adc_configuration()).sample_rate()
     await icosystem.start_measurement(streaming_configuration)
-    while len(collected_data) < sample_rate:
+    values_per_message = 3
+    while len(collected_data) * values_per_message < sample_rate:
         await sleep(0.01)
     assert isinstance(start, float)
     collection_time = monotonic() - start
@@ -172,8 +173,8 @@ async def test_measurement(connect_sensor_node):
     assert 0.9 <= collection_time <= 1.3
 
     await icosystem.stop_measurement()
-    assert len(collected_data) >= sample_rate
-    average = mean(collected_data)
+    assert len(collected_data) * values_per_message >= sample_rate
+    average = mean(collected_data.first().values)
     approx_zero_g_absolute = 2**15
     approx_four_g_relative_100g_sensor = 4 * 2**16 / 200
     assert isclose(

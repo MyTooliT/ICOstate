@@ -191,3 +191,78 @@ The example below shows how you can react to changes of the sensor node name:
    >>>                                    # sensor node
    >>> run(react_sensor_node_name(ICOsystem(), mac_address))
    Name of sensor node: Test-STH
+
+
+Measurement (Streaming)
+#######################
+
+To start a measurement use the function `start_measurement` and provide a :class:`StreamingConfiguration`, which specifies the measurement channels that should be active. To retrieve the measurement data (objects of the class :class:`MeasurementData`) use the `pyee`_ event ``sensor_node_measurement_data``. The example below shows you how to do that:
+
+.. doctest::
+
+   >>> from asyncio import run, sleep
+   >>> from time import time
+   >>> from icostate import ICOsystem, MeasurementData, StreamingConfiguration
+
+   >>> async def measure_data(icosystem: ICOsystem, mac_address: str) -> None:
+   ...     await icosystem.connect_stu()
+   ...     await icosystem.connect_sensor_node_mac(mac_address)
+   ...
+   ...     data = None
+   ...     measurement_time = None
+   ...
+   ...     @icosystem.on("sensor_node_measurement_data")
+   ...     async def measurement_data_changed(measurement_data:
+   ...                                        MeasurementData) -> None:
+   ...         nonlocal measurement_time
+   ...         measurement_time = time()
+   ...         nonlocal data
+   ...         data = measurement_data
+   ...
+   ...     await icosystem.start_measurement(StreamingConfiguration(first=True))
+   ...     # Wait until one measurement data object is ready
+   ...     while data is None:
+   ...         await sleep(0.01)
+   ...
+   ...     await icosystem.stop_measurement()
+   ...
+   ...     # Use methods `first`, `second`, and `third` to access different
+   ...     # channels
+   ...     first_channel = data.first()
+   ...     # Measurement data is saved as raw 16 bit ADC values
+   ...     assert all((
+   ...         True if 0 <= value <= 2**16 else False
+   ...         for value in first_channel.values
+   ...     ))
+   ...     # Timestamps store the seconds since the epoch as reported by the CAN
+   ...     # library and can be quite different from the time as reported
+   ...     # by the built in `time` function.
+   ...     ten_hours = 10 * 3600
+   ...     assert all((
+   ...         (
+   ...             True
+   ...             if measurement_time - ten_hours
+   ...             <= timestamp
+   ...             <= measurement_time + ten_hours
+   ...             else False
+   ...         )
+   ...         for timestamp in first_channel.timestamps
+   ...     ))
+   ...
+   ...     # You can also access the measurement counters
+   ...     # (cyclic value between 0 - 255)
+   ...     assert all((
+   ...         True if 0 <= counter <= 255 else False
+   ...         for counter in first_channel.counters
+   ...     ))
+   ...     # To get a sense of the quality of the signal you can use the method
+   ...     # dataloss, which will return a value between 0 (no data loss) and
+   ...     # 1 (all data lost).
+   ...     assert 0 <= data.dataloss() <= 1
+   ...
+   ...     await icosystem.disconnect_sensor_node()
+   ...     await icosystem.disconnect_stu()
+
+   >>> mac_address = "08-6B-D7-01-DE-81"  # Change to MAC address of your
+   >>>                                    # sensor node
+   >>> run(measure_data(ICOsystem(), mac_address))

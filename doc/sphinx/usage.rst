@@ -237,13 +237,13 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...     # Timestamps store the seconds since the epoch as reported by the CAN
    ...     # library and can be quite different from the time as reported
    ...     # by the built in `time` function.
-   ...     ten_hours = 10 * 3600
+   ...     three_days = 3 * 24 * 3600
    ...     assert all((
    ...         (
    ...             True
-   ...             if measurement_time - ten_hours
+   ...             if measurement_time - three_days
    ...             <= timestamp
-   ...             <= measurement_time + ten_hours
+   ...             <= measurement_time + three_days
    ...             else False
    ...         )
    ...         for timestamp in first_channel.timestamps

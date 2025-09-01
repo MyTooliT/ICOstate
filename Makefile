@@ -26,8 +26,8 @@ check:
 .PHONY: test
 test:
 	poetry run coverage run -m pytest $(TEST_LOCATIONS) || \
-	  { poetry run icon stu reset && \
-	    poetry run coverage run --append -m pytest --last-failed; }
+	  ( poetry run icon stu reset && \
+	    poetry run coverage run --append -m pytest --last-failed )
 
 .PHONY: test-no-hardware
 test-no-hardware:

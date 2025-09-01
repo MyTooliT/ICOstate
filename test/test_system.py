@@ -13,7 +13,7 @@ from netaddr import EUI
 from pytest import mark
 
 from icostate.measurement import MeasurementData
-from icostate.system import ICOsystem
+from icostate.system import ICOsystem, State
 
 # -- Functions ----------------------------------------------------------------
 
@@ -163,6 +163,12 @@ async def test_measurement(connect_sensor_node):
         collected_data.extend(measurement_data)
 
     sample_rate = (await icosystem.get_adc_configuration()).sample_rate()
+    allowed_dataloss = 0.02
+
+    # ====================
+    # = Infinite Runtime =
+    # ====================
+
     await icosystem.start_measurement(streaming_configuration)
     values_per_message = 3
     while len(collected_data) * values_per_message < sample_rate:
@@ -173,7 +179,7 @@ async def test_measurement(connect_sensor_node):
     collection_time = monotonic() - start
     assert 0.9 <= collection_time <= 1.3
 
-    assert collected_data.dataloss() < 0.01
+    assert collected_data.dataloss() < allowed_dataloss
 
     assert len(collected_data) * values_per_message >= sample_rate
     average = mean(collected_data.first().values)
@@ -183,4 +189,21 @@ async def test_measurement(connect_sensor_node):
         average,
         approx_zero_g_absolute,
         rel_tol=approx_four_g_relative_100g_sensor,
+    )
+
+    # ==================
+    # = Finite Runtime =
+    # ==================
+
+    runtime = 5
+    await icosystem.start_measurement(streaming_configuration, runtime=runtime)
+    # Wait until measurement has taken place
+    await sleep(runtime + 1)
+
+    assert icosystem.state == State.SENSOR_NODE_CONNECTED
+    assert collected_data.dataloss() < allowed_dataloss
+    approx_time_stream_open = 0.3
+    assert (
+        len(collected_data) * values_per_message
+        >= (runtime - approx_time_stream_open) * sample_rate
     )

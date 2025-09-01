@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from asyncio import create_task, sleep, Task
 from logging import getLogger
+from math import inf
 from time import monotonic
 from typing import Any
 
@@ -45,7 +46,10 @@ class Measurement:
         """Measurement update rate in Hz"""
 
     def start(
-        self, configuration: StreamingConfiguration, update_rate: float
+        self,
+        configuration: StreamingConfiguration,
+        update_rate: float,
+        runtime: float = inf,
     ) -> None:
         """Start the measurement
 
@@ -62,6 +66,10 @@ class Measurement:
                 a second ``icosystem`` emits the
                 ``sensor_node_measurement_data`` event.
 
+            runtime:
+
+                The measurement runtime in seconds
+
         """
 
         self.update_rate = update_rate
@@ -71,7 +79,7 @@ class Measurement:
             self.stop()
 
         self.logger.info("Creating new measurement task")
-        self.read_task = create_task(self._read(configuration))
+        self.read_task = create_task(self._read(configuration, runtime))
 
     def stop(self):
         """Stop the current measurement"""
@@ -80,13 +88,19 @@ class Measurement:
             self.read_task.cancel()
         self.read_task = None
 
-    async def _read(self, configuration: StreamingConfiguration):
+    async def _read(
+        self, configuration: StreamingConfiguration, runtime: float = inf
+    ):
         """Task for collecting measurement data
 
         configuration:
 
             The streaming configuration that should be used for the
             measurement
+
+        runtime:
+
+            The measurement runtime in seconds
 
         """
 
@@ -97,16 +111,20 @@ class Measurement:
                 "Opened stream with configuration: %s", configuration
             )
 
-            start = monotonic()
             period = 1 / self.update_rate
             collected_data = MeasurementData(configuration)
+            start = monotonic()
+            end = start + runtime
             async for data, _ in stream:
                 collected_data.append(data)
                 current = monotonic()
-                if current - start >= period:
+                if current - start >= period or current >= end:
                     self.icosystem.emit(
                         "sensor_node_measurement_data", collected_data
                     )
+                    if current >= end:
+                        self.icosystem.state = State.SENSOR_NODE_CONNECTED
+                        break
                     start = current
                     collected_data = MeasurementData(configuration)
 
@@ -817,7 +835,10 @@ class ICOsystem(AsyncIOEventEmitter):
             await self.disconnect_sensor_node()
 
     async def start_measurement(
-        self, configuration: StreamingConfiguration, update_rate: float = 60
+        self,
+        configuration: StreamingConfiguration,
+        update_rate: float = 60,
+        runtime: float = inf,
     ) -> None:
         """Start Measurement
 
@@ -834,13 +855,17 @@ class ICOsystem(AsyncIOEventEmitter):
                 a second ``icosystem`` emits the
                 ``sensor_node_measurement_data`` event.
 
+            runtime:
+
+                The measurement runtime in seconds
+
         """
 
         self._check_state(
             {State.SENSOR_NODE_CONNECTED}, "Starting measurement"
         )
 
-        self.measurement.start(configuration, update_rate)
+        self.measurement.start(configuration, update_rate, runtime)
 
         self.state = State.MEASUREMENT
 

@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from typing import Callable
+
 from icotronic.can import StreamingConfiguration, StreamingData
 from icotronic.can.dataloss import calculate_dataloss_stats
 
@@ -76,6 +78,36 @@ class ChannelData:
                 self.counters, self.timestamps, self.values
             )
         ])
+
+
+class Conversion:
+    """Conversion functions for measurement data
+
+    Args:
+
+        first:
+
+            The conversion function for the first channel
+
+        second:
+
+            The conversion function for the second channel
+
+        third:
+
+            The conversion function for the third channel
+
+    """
+
+    def __init__(
+        self,
+        first: Callable[[float], float] | None = None,
+        second: Callable[[float], float] | None = None,
+        third: Callable[[float], float] | None = None,
+    ) -> None:
+        self.first = first
+        self.second = second
+        self.third = third
 
 
 # pylint: enable=too-few-public-methods
@@ -498,6 +530,134 @@ class MeasurementData:
             )
 
         self.streaming_data_list.extend(data.streaming_data_list)
+
+    def apply(self, conversion: Conversion) -> MeasurementData:
+        """Apply functions to the values stored in the measurement
+
+        Args:
+
+            conversion:
+
+                The conversion functions that will be applied to the
+                measurement
+
+        Returns:
+
+            The measurement data itself, after the conversion was applied
+
+        Examples:
+
+            Apply functions to some measurement data with one active channel
+
+
+            >>> config = StreamingConfiguration(first=False, second=True,
+            ...                                 third=False)
+            >>> data = MeasurementData(config)
+            >>> s1 = StreamingData(values=[1, 20, 81], counter=22,
+            ...                    timestamp=1756125747.528234)
+            >>> s2 = StreamingData(values=[50, 1, 29], counter=25,
+            ...                    timestamp=1756125747.528254)
+            >>> data.append(s1)
+            >>> data.append(s2)
+
+            >>> plus_two = (lambda value: value + 2)
+            >>> conversion = Conversion(second=plus_two)
+
+            >>> data
+            Channel 1 disabled, Channel 2 enabled, Channel 3 disabled
+            [1, 20, 81]@1756125747.528234 #22
+            [50, 1, 29]@1756125747.528254 #25
+            >>> data.apply(conversion)
+            Channel 1 disabled, Channel 2 enabled, Channel 3 disabled
+            [3, 22, 83]@1756125747.528234 #22
+            [52, 3, 31]@1756125747.528254 #25
+
+            Apply functions to some measurement data with two active channels
+
+            >>> config = StreamingConfiguration(first=True, second=False,
+            ...                                 third=True)
+            >>> data = MeasurementData(config)
+            >>> s1 = StreamingData(values=[1, 2], counter=255,
+            ...                    timestamp=1756125747.528234)
+            >>> s2 = StreamingData(values=[3, 4], counter=0,
+            ...                    timestamp=1756125747.528237)
+            >>> data.append(s1)
+            >>> data.append(s2)
+
+            >>> conversion = Conversion(third=plus_two)
+
+            >>> data
+            Channel 1 enabled, Channel 2 disabled, Channel 3 enabled
+            [1, 2]@1756125747.528234 #255
+            [3, 4]@1756125747.528237 #0
+
+            >>> data.apply(conversion)
+            Channel 1 enabled, Channel 2 disabled, Channel 3 enabled
+            [1, 4]@1756125747.528234 #255
+            [3, 6]@1756125747.528237 #0
+
+            Apply functions to some measurement data with three active channels
+
+            >>> config = StreamingConfiguration(first=True, second=True,
+            ...                                 third=True)
+            >>> data = MeasurementData(config)
+            >>> s1 = StreamingData(values=[4, 5, 3], counter=15,
+            ...                    timestamp=1756197008.776551)
+            >>> s2 = StreamingData(values=[8, 10, 6], counter=16,
+            ...                    timestamp=1756197008.776559)
+            >>> data.append(s1)
+            >>> data.append(s2)
+
+            >>> double = (lambda value: value * 2)
+            >>> conversion = Conversion(first=double, third=plus_two)
+
+            >>> data
+            Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
+            [4, 5, 3]@1756197008.776551 #15
+            [8, 10, 6]@1756197008.776559 #16
+
+            >>> data.apply(conversion)
+            Channel 1 enabled, Channel 2 enabled, Channel 3 enabled
+            [8, 5, 5]@1756197008.776551 #15
+            [16, 10, 8]@1756197008.776559 #16
+
+        """
+
+        enabled_channels = self.configuration.enabled_channels()
+        config = self.configuration
+
+        functions = []
+
+        if enabled_channels == 1:
+            # Apply single function to all values
+            function = (
+                conversion.first
+                if config.first
+                else (conversion.second if config.second else config.third)
+            )
+            if function is not None:
+                functions = [function, function, function]
+
+        elif enabled_channels == 2:
+            # Apply single function to single value
+            if config.first:
+                functions = [
+                    conversion.first,
+                    conversion.second if config.second else conversion.third,
+                ]
+            else:
+                functions = [conversion.second, conversion.third]
+
+        elif enabled_channels == 3:
+            functions = [conversion.first, conversion.second, conversion.third]
+
+        for streaming_data in self.streaming_data_list:
+            values = streaming_data.values
+            for (index, value), function in zip(enumerate(values), functions):
+                if function is not None:
+                    values[index] = function(value)
+
+        return self
 
 
 if __name__ == "__main__":

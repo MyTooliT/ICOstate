@@ -182,7 +182,7 @@ async def test_measurement(connect_sensor_node):
     assert collected_data.dataloss() < allowed_dataloss
 
     assert len(collected_data) * values_per_message >= sample_rate
-    average = mean(collected_data.first().values)
+    average = mean((data.value for data in collected_data.first()))
     approx_zero_g_absolute = 2**15
     approx_four_g_relative_100g_sensor = 4 * 2**16 / 200
     assert isclose(

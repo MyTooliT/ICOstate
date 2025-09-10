@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from ctypes import c_uint8
+from typing import Callable, NamedTuple
 
 from icotronic.can import StreamingConfiguration, StreamingData
 from icotronic.can.dataloss import calculate_dataloss_stats
@@ -14,40 +15,40 @@ from icotronic.can.dataloss import calculate_dataloss_stats
 # pylint: disable=too-few-public-methods
 
 
+class DataPoint(NamedTuple):
+    """Streaming data point"""
+
+    counter: c_uint8
+    """Message counter"""
+    timestamp: float
+    """Timestamp of data"""
+    value: float
+    """Data value"""
+
+    def __repr__(self):
+        """Get textual representation of data
+
+        Returns:
+
+            A string containing the attributes of this datapoint
+
+        Examples:
+
+            Get the textual representation of a data point
+
+            >>> DataPoint(counter=1, timestamp=2, value=3)
+            3@2 #1
+
+        """
+
+        return f"{self.value}@{self.timestamp} #{self.counter}"
+
+
 class ChannelData:
-    """Store measurement data for a single channel
+    """Store measurement data for a single channel"""
 
-    The data is stored in three list with the same length:
-
-        - counters
-        - timestamps
-        - values
-
-    Args:
-
-        counters:
-
-            Message counter (0 – 255) for each measured value
-
-        timestamps:
-
-            Timestamps for each measured value
-
-        values:
-
-            The measured values
-
-    """
-
-    def __init__(
-        self,
-        counters: list[float] | None = None,
-        timestamps: list[float] | None = None,
-        values: list[float] | None = None,
-    ) -> None:
-        self.counters = [] if counters is None else counters
-        self.timestamps = [] if timestamps is None else timestamps
-        self.values = [] if values is None else values
+    def __init__(self) -> None:
+        self.data: list[DataPoint] = []
 
     def __repr__(self) -> str:
         """Get the string representation of the data
@@ -58,9 +59,13 @@ class ChannelData:
 
             >>> t1 = 1756124450.256398
             >>> t2 = 1756124450.2564
-            >>> data = ChannelData(counters = [1, 1, 1, 2, 2, 2],
-            ...                    timestamps = [t1, t1, t1, t2, t2, t2],
-            ...                    values = [4, 5, 6, 7, 8, 9])
+            >>> data = ChannelData()
+            >>> data.append(DataPoint(counter=1, timestamp=t1, value=4))
+            >>> data.append(DataPoint(counter=1, timestamp=t1, value=5))
+            >>> data.append(DataPoint(counter=1, timestamp=t1, value=6))
+            >>> data.append(DataPoint(counter=2, timestamp=t2, value=7))
+            >>> data.append(DataPoint(counter=2, timestamp=t2, value=8))
+            >>> data.append(DataPoint(counter=2, timestamp=t2, value=9))
 
             >>> data # doctest:+NORMALIZE_WHITESPACE
             4@1756124450.256398 #1
@@ -72,12 +77,34 @@ class ChannelData:
 
         """
 
-        return "\n".join([
-            f"{value}@{timestamp} #{counter}"
-            for counter, timestamp, value in zip(
-                self.counters, self.timestamps, self.values
-            )
-        ])
+        return "\n".join([repr(datapoint) for datapoint in self.data])
+
+    def append(self, data: DataPoint) -> None:
+        """Append a value to the channel data
+
+        Args:
+
+            data:
+
+                The data point that should be added to the channel data
+
+        Examples:
+
+            Add some data points to a channel data object
+
+            >>> data = ChannelData()
+
+            >>> t1 = 1756124450.256398
+            >>> t2 = t1 + 0.000003
+            >>> data.append(DataPoint(counter=255, timestamp=t1, value=10))
+            >>> data.append(DataPoint(counter=1, timestamp=t2, value=20))
+            >>> data
+            10@1756124450.256398 #255
+            20@1756124450.256401 #1
+
+        """
+
+        self.data.append(data)
 
 
 class Conversion:
@@ -263,18 +290,26 @@ class MeasurementData:
             if not configuration.second and not configuration.third:
                 # Three values
                 for streaming_data in self.streaming_data_list:
-                    for _ in range(3):
-                        channel_data.counters.append(streaming_data.counter)
-                        channel_data.timestamps.append(
-                            streaming_data.timestamp
+                    counter = streaming_data.counter
+                    timestamp = streaming_data.timestamp
+                    for value in streaming_data.values:
+                        channel_data.append(
+                            DataPoint(
+                                counter=counter,
+                                timestamp=timestamp,
+                                value=value,
+                            )
                         )
-                    channel_data.values.extend(streaming_data.values)
             else:
                 # One value
                 for streaming_data in self.streaming_data_list:
-                    channel_data.counters.append(streaming_data.counter)
-                    channel_data.timestamps.append(streaming_data.timestamp)
-                    channel_data.values.append(streaming_data.values[0])
+                    channel_data.append(
+                        DataPoint(
+                            counter=streaming_data.counter,
+                            timestamp=streaming_data.timestamp,
+                            value=streaming_data.values[0],
+                        )
+                    )
 
         return channel_data
 
@@ -339,21 +374,29 @@ class MeasurementData:
             if not configuration.first and not configuration.third:
                 # Three values
                 for streaming_data in self.streaming_data_list:
-                    for _ in range(3):
-                        channel_data.counters.append(streaming_data.counter)
-                        channel_data.timestamps.append(
-                            streaming_data.timestamp
+                    counter = streaming_data.counter
+                    timestamp = streaming_data.timestamp
+                    for value in streaming_data.values:
+                        channel_data.append(
+                            DataPoint(
+                                counter=counter,
+                                timestamp=timestamp,
+                                value=value,
+                            )
                         )
-                    channel_data.values.extend(streaming_data.values)
             else:
                 # One value
                 for streaming_data in self.streaming_data_list:
-                    channel_data.counters.append(streaming_data.counter)
-                    channel_data.timestamps.append(streaming_data.timestamp)
-                    channel_data.values.append(
-                        streaming_data.values[0]
-                        if not configuration.first
-                        else streaming_data.values[1]
+                    channel_data.append(
+                        DataPoint(
+                            counter=streaming_data.counter,
+                            timestamp=streaming_data.timestamp,
+                            value=(
+                                streaming_data.values[0]
+                                if not configuration.first
+                                else streaming_data.values[1]
+                            ),
+                        )
                     )
 
         return channel_data
@@ -419,18 +462,26 @@ class MeasurementData:
             if not configuration.first and not configuration.second:
                 # Three values
                 for streaming_data in self.streaming_data_list:
-                    for _ in range(3):
-                        channel_data.counters.append(streaming_data.counter)
-                        channel_data.timestamps.append(
-                            streaming_data.timestamp
+                    counter = streaming_data.counter
+                    timestamp = streaming_data.timestamp
+                    for value in streaming_data.values:
+                        channel_data.append(
+                            DataPoint(
+                                counter=counter,
+                                timestamp=timestamp,
+                                value=value,
+                            )
                         )
-                    channel_data.values.extend(streaming_data.values)
             else:
                 # One value
                 for streaming_data in self.streaming_data_list:
-                    channel_data.counters.append(streaming_data.counter)
-                    channel_data.timestamps.append(streaming_data.timestamp)
-                    channel_data.values.append(streaming_data.values[-1])
+                    channel_data.append(
+                        DataPoint(
+                            counter=streaming_data.counter,
+                            timestamp=streaming_data.timestamp,
+                            value=streaming_data.values[-1],
+                        )
+                    )
 
         return channel_data
 

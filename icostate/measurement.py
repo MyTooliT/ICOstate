@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from ctypes import c_uint8
-from typing import Callable, NamedTuple
+from typing import Callable, Iterator, NamedTuple
 
 from icotronic.can import StreamingConfiguration, StreamingData
 from icotronic.can.dataloss import calculate_dataloss_stats
@@ -78,6 +78,33 @@ class ChannelData:
         """
 
         return "\n".join([repr(datapoint) for datapoint in self.data])
+
+    def __iter__(self) -> Iterator:
+        """Iterate over the channel data
+
+        Returns:
+
+            An iterator over the data points of the channel data
+
+        Examples:
+
+            Print the timestamps of some channel data
+
+            >>> data = ChannelData()
+            >>> t1 = 1756124450.1234
+            >>> t2 = 1756124450.1235
+
+            >>> data.append(DataPoint(counter=1, timestamp=t1, value=4))
+            >>> data.append(DataPoint(counter=1, timestamp=t2, value=5))
+
+            >>> for point in data:
+            ...     print(point.timestamp)
+            1756124450.1234
+            1756124450.1235
+
+        """
+
+        return iter(self.data)
 
     def append(self, data: DataPoint) -> None:
         """Append a value to the channel data

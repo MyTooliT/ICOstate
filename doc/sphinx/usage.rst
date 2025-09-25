@@ -231,8 +231,8 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...     first_channel = data.first()
    ...     # Measurement data is saved as raw 16 bit ADC values
    ...     assert all((
-   ...         True if 0 <= value <= 2**16 else False
-   ...         for value in first_channel.values
+   ...         True if 0 <= data.value <= 2**16 else False
+   ...         for data in first_channel
    ...     ))
    ...     # Timestamps store the seconds since the epoch as reported by the CAN
    ...     # library and can be quite different from the time as reported
@@ -242,18 +242,18 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...         (
    ...             True
    ...             if measurement_time - three_days
-   ...             <= timestamp
+   ...             <= data.timestamp
    ...             <= measurement_time + three_days
    ...             else False
    ...         )
-   ...         for timestamp in first_channel.timestamps
+   ...         for data in first_channel
    ...     ))
    ...
    ...     # You can also access the measurement counters
    ...     # (cyclic value between 0 - 255)
    ...     assert all((
-   ...         True if 0 <= counter <= 255 else False
-   ...         for counter in first_channel.counters
+   ...         True if 0 <= data.counter <= 255 else False
+   ...         for data in first_channel
    ...     ))
    ...     # To get a sense of the quality of the signal you can use the method
    ...     # dataloss, which will return a value between 0 (no data loss) and

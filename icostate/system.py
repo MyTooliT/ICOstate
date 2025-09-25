@@ -10,15 +10,14 @@ from math import inf
 from time import monotonic
 from typing import Any
 
-from icotronic.can import Connection, StreamingConfiguration, STU
+from icotronic.can import Connection, SensorNode, StreamingConfiguration, STU
 from icotronic.can.adc import ADCConfiguration
-from icotronic.can.node.sensor import SensorNode
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
 from icotronic.can.status import State as NodeState
+from icotronic.measurement import MeasurementData
 from netaddr import AddrFormatError, EUI
 from pyee.asyncio import AsyncIOEventEmitter
 
-from icostate.measurement import MeasurementData
 from icostate.error import IncorrectStateError
 from icostate.sensor import SensorNodeAttributes
 from icostate.state import State

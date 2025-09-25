@@ -3,5 +3,5 @@
 from icotronic.can.adc import ADCConfiguration
 from icotronic.can.streaming import StreamingConfiguration
 from icotronic.can.node.stu import SensorNodeInfo
-from icostate.measurement import MeasurementData
+from icotronic.measurement import MeasurementData
 from icostate.system import ICOsystem

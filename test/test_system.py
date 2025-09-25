@@ -9,10 +9,10 @@ from time import monotonic
 
 from icotronic.can.adc import ADCConfiguration
 from icotronic.can import StreamingConfiguration
+from icotronic.measurement import MeasurementData
 from netaddr import EUI
 from pytest import mark
 
-from icostate.measurement import MeasurementData
 from icostate.system import ICOsystem, State
 
 # -- Functions ----------------------------------------------------------------

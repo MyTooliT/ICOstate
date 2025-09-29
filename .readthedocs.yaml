@@ -7,7 +7,10 @@ build:
 
 python:
   install:
-    - requirements: doc/sphinx/requirements.txt
+    - method: pip
+      path: .
+      extra_requirements:
+        - dev
 
 sphinx:
   configuration: doc/sphinx/conf.py

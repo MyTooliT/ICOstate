@@ -32,7 +32,6 @@ dev = [
   "black>=25.1.0",
   "coverage>=7.9.2",
   "Flake8-pyproject>=1.2.3",
-  "furo>=2024.8.6",
   "mypy>=1.16.1",
   "myst-parser>=4.0.1",
   "pydoclint[flake8]>=0.6.6",
@@ -40,6 +39,7 @@ dev = [
   "sphinx-autodoc-typehints>=3",
   "sphinxcontrib-mermaid>=1.0.0",
   "sphinx-pyproject>=0.3",
+  "sphinx_rtd_theme",
   "sphinx_toggleprompt>=0.6.0",
 ]
 test = [

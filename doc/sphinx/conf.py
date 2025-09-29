@@ -44,6 +44,6 @@ autodoc_inherit_docstrings = False
 
 # -- HTML Theme ---------------------------------------------------------------
 
-html_theme = "furo"
+html_theme = "sphinx_rtd_theme"
 
 # pylint: enable=invalid-name

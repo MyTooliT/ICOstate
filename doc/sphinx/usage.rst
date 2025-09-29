@@ -234,20 +234,17 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...         True if 0 <= data.value <= 2**16 else False
    ...         for data in first_channel
    ...     ))
-   ...     # Timestamps store the seconds since the epoch as reported by the CAN
-   ...     # library and can be quite different from the time as reported
-   ...     # by the built in `time` function.
-   ...     three_days = 3 * 24 * 3600
+   ...     # Timestamps use the system clock information
    ...     assert all((
    ...         (
    ...             True
-   ...             if measurement_time - three_days
+   ...             if measurement_time - 1
    ...             <= data.timestamp
-   ...             <= measurement_time + three_days
+   ...             <= measurement_time + 1
    ...             else False
    ...         )
    ...         for data in first_channel
-   ...     ))
+   ...     )), "Offset of timestamp of measurement data too large"
    ...
    ...     # You can also access the measurement counters
    ...     # (cyclic value between 0 - 255)

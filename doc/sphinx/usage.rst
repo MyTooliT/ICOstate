@@ -231,26 +231,26 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...     first_channel = data.first()
    ...     # Measurement data is saved as raw 16 bit ADC values
    ...     assert all((
-   ...         True if 0 <= data.value <= 2**16 else False
-   ...         for data in first_channel
+   ...         True if 0 <= datapoint.value <= 2**16 else False
+   ...         for datapoint in first_channel
    ...     ))
-   ...     # Timestamps use the system clock information
+   ...     # Timestamps are stored in seconds from the epoch
    ...     assert all((
    ...         (
    ...             True
    ...             if measurement_time - 1
-   ...             <= data.timestamp
+   ...             <= datapoint.timestamp
    ...             <= measurement_time + 1
    ...             else False
    ...         )
-   ...         for data in first_channel
+   ...         for datapoint in first_channel
    ...     )), "Offset of timestamp of measurement data too large"
    ...
    ...     # You can also access the measurement counters
    ...     # (cyclic value between 0 - 255)
    ...     assert all((
-   ...         True if 0 <= data.counter <= 255 else False
-   ...         for data in first_channel
+   ...         True if 0 <= datapoint.counter <= 255 else False
+   ...         for datapoint in first_channel
    ...     ))
    ...     # To get a sense of the quality of the signal you can use the method
    ...     # dataloss, which will return a value between 0 (no data loss) and

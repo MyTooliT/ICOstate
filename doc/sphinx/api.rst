@@ -18,3 +18,6 @@ Measurement
 
 .. autoclass:: MeasurementData
    :members:
+
+.. autoclass:: Conversion
+   :members:

@@ -229,7 +229,7 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...     # Use methods `first`, `second`, and `third` to access different
    ...     # channels
    ...     first_channel = data.first()
-   ...     # Measurement data is saved as raw 16 bit ADC values
+   ...     # By default measurement data is saved as raw 16 bit ADC value
    ...     assert all((
    ...         True if 0 <= datapoint.value <= 2**16 else False
    ...         for datapoint in first_channel
@@ -263,3 +263,20 @@ To start a measurement use the function `start_measurement` and provide a :class
    >>> mac_address = "08-6B-D7-01-DE-81"  # Change to MAC address of your
    >>>                                    # sensor node
    >>> run(measure_data(ICOsystem(), mac_address))
+
+For more information on how to work with measurement data, please take a look at the links below.
+
+.. table:: Additional documentation about measurement data
+   :widths: auto
+
+   +--------------------------+------------------------------------------------+
+   | Topic                    |  Links                                         |
+   +--------------------------+------------------------------------------------+
+   | Conversion               | - Function :func:`MeasurementData.apply`       |
+   |                          | - `Converting Data Values`_ (ICOtronic library)|
+   +--------------------------+------------------------------------------------+
+   | Storing Measurement Data | - `Storing Data`_ (ICOtronic library)          |
+   +--------------------------+------------------------------------------------+
+
+.. _Converting Data Values: https://icotronic.readthedocs.io/en/5.0.0/usage.html#converting-data-values
+.. _Storing Data: https://icotronic.readthedocs.io/en/5.0.0/usage.html#storing-data

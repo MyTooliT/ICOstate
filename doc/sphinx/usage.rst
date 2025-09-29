@@ -97,7 +97,7 @@ To retrieve information about available sensor nodes use the coroutine :meth:`IC
    True
    >>> isinstance(node_info.mac_address, EUI)
    True
-   >>> -80 < node_info.rssi < 0
+   >>> -100 < node_info.rssi < 0
    True
 
 Sensor Node

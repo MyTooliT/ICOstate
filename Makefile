@@ -17,30 +17,35 @@ TEST_LOCATIONS := $(SPHINX_INPUT_DIRECTORY)/usage.rst \
 .PHONY: all
 all: check test coverage
 
+.PHONY: setup
+setup:
+	uv venv --allow-existing
+	uv sync --all-extras
+
 .PHONY: check
 check:
-	poetry run flake8
-	poetry run mypy .
-	poetry run pylint .
+	uv run flake8
+	uv run mypy .
+	uv run pylint .
 
 .PHONY: test
 test:
-	poetry run coverage run -m pytest $(TEST_LOCATIONS) || \
-	  ( poetry run icon stu reset && \
-	    poetry run coverage run --append -m pytest --last-failed )
+	uv run coverage run -m pytest $(TEST_LOCATIONS) || \
+	  ( uv run icon stu reset && \
+	    uv run coverage run --append -m pytest --last-failed )
 
 .PHONY: test-no-hardware
 test-no-hardware:
-	poetry run coverage run -m pytest \
-		--ignore '$(MODULE)/system.py' \
-		--ignore '$(TEST_DIRECTORY)/test_system.py'
+	uv run coverage run -m pytest \
+	    --ignore '$(MODULE)/system.py' \
+	    --ignore '$(TEST_DIRECTORY)/test_system.py'
 
 .PHONY: coverage
 coverage:
-	poetry run coverage report
+	uv run coverage report
 
 .PHONY: documentation
 documentation:
-	poetry run sphinx-apidoc -f -o $(SPHINX_DIRECTORY) $(SPHINX_INPUT_DIRECTORY)
-	poetry run sphinx-build -M html $(SPHINX_INPUT_DIRECTORY) \
+	uv run sphinx-apidoc -f -o $(SPHINX_DIRECTORY) $(SPHINX_INPUT_DIRECTORY)
+	uv run sphinx-build -M html $(SPHINX_INPUT_DIRECTORY) \
 	    $(SPHINX_DIRECTORY)

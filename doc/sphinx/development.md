@@ -3,16 +3,17 @@
 While not strictly a necessity, we assume that you installed the following developer dependencies:
 
 - [Make](<https://en.wikipedia.org/wiki/Make_(software)>)
-- [Poetry](https://python-poetry.org)
+- [uv](https://docs.astral.sh/uv/)
 
 in the text below.
 
 ## Install
 
-For development we recommend you clone the repository and install the package with poetry:
+For development we recommend you clone the repository and install the package with uv:
 
 ```sh
-poetry lock && poetry install --all-extras
+uv venv --allow-existing
+uv sync --all-extras
 ```
 
 ## Check
@@ -41,8 +42,8 @@ make check
    3. Push changes
 
    ```sh
-   poetry version <VERSION>
-   export icostate_version="$(poetry version -s)"
+   uv version <VERSION>
+   export icostate_version="$(uv version --short)"
    git commit -a -m "Release: Release version $icostate_version"
    git tag "$icostate_version"
    git push && git push --tags

@@ -278,5 +278,5 @@ For more information on how to work with measurement data, please take a look at
    | Storing Measurement Data | - `Storing Data`_ (ICOtronic library)          |
    +--------------------------+------------------------------------------------+
 
-.. _Converting Data Values: https://icotronic.readthedocs.io/en/5.0.0/usage.html#converting-data-values
-.. _Storing Data: https://icotronic.readthedocs.io/en/5.0.0/usage.html#storing-data
+.. _Converting Data Values: https://icotronic.readthedocs.io/en/6.0.0/usage.html#converting-data-values
+.. _Storing Data: https://icotronic.readthedocs.io/en/6.0.0/usage.html#storing-data

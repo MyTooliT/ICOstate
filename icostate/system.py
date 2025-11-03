@@ -141,6 +141,10 @@ class ICOsystem(AsyncIOEventEmitter):
 
             Keyword arguments (handled by pyee)
 
+    Raises:
+
+        CANInitError: if the CAN initialization fails
+
     """
 
     def __init__(self, *arguments, **keyword_arguments):

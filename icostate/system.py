@@ -185,7 +185,8 @@ class ICOsystem(AsyncIOEventEmitter):
             plural = "" if len(states) <= 1 else "s"
             raise IncorrectStateError(
                 f"{description} only allowed in the state{plural}: "
-                f"{', '.join(map(str, states))}"
+                f"{', '.join(map(str, states))} (not in the state "
+                f"{self.state})"
             )
 
     async def connect_stu(self) -> None:
@@ -275,7 +276,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Traceback (most recent call last):
                ...
             icostate.error.IncorrectStateError: Resetting STU only allowed in
-                                                the state: STU Connected
+                the state: STU Connected (not in the state Disconnected)
 
         """
 

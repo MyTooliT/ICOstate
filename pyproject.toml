@@ -46,6 +46,7 @@ test = [
   "pytest-asyncio>=1.0.0",
   "pytest-rerunfailures>=16.1",
   "pytest-sphinx>=0.6.3",
+  "pytest-sugar>=1.1.1",
 ]
 
 [project.urls]

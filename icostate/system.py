@@ -161,7 +161,9 @@ class ICOsystem(AsyncIOEventEmitter):
         self.sensor_node_attributes: SensorNodeAttributes | None = None
         """Information about currently connected sensor node"""
 
-    def _check_state(self, states: set[State], description: str) -> None:
+    def _check_in_state(
+        self, states: set[State], description: str, invert=False
+    ) -> None:
         """Check if the system is in an allowed state
 
         Args:
@@ -173,6 +175,11 @@ class ICOsystem(AsyncIOEventEmitter):
                 A description of the action that is only allowed in the states
                 specified by ``states``
 
+            invert:
+                Specifies if the state check should be inverted, i.e. that the
+                code should check that the current state is not part of any of
+                the states in ``states``
+
         Raises:
 
             IncorrectStateError:
@@ -181,13 +188,22 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        if self.state not in states:
-            plural = "" if len(states) <= 1 else "s"
-            raise IncorrectStateError(
-                f"{description} only allowed in the state{plural}: "
-                f"{', '.join(map(str, states))} (not in the state "
-                f"{self.state})"
-            )
+        plural = "" if len(states) <= 1 else "s"
+        states_representation = ", ".join(map(str, states))
+        state_info = f"(current state: {self.state})"
+        if invert:
+            if self.state in states:
+                raise IncorrectStateError(
+                    f"{description} not allowed in the state{plural}:"
+                    f" {states_representation}"
+                    + (f" {state_info}" if plural else "")
+                )
+        else:
+            if self.state not in states:
+                raise IncorrectStateError(
+                    f"{description} only allowed in the state{plural}: "
+                    f"{states_representation} {state_info}"
+                )
 
     async def connect_stu(self) -> None:
         """Connect to STU
@@ -219,7 +235,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state({State.DISCONNECTED}, "Connecting to STU")
+        self._check_in_state({State.DISCONNECTED}, "Connecting to STU")
 
         # pylint: disable=unnecessary-dunder-call
         self.stu = await self.connection.__aenter__()
@@ -238,11 +254,59 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state({State.STU_CONNECTED}, "Disconnecting from STU")
+        self._check_in_state({State.STU_CONNECTED}, "Disconnecting from STU")
 
         await self.connection.__aexit__(None, None, None)
         self.state = State.DISCONNECTED
         self.stu = None
+
+    async def get_stu_mac_address(self) -> EUI:
+        """Get STU MAC address
+
+        Raises:
+
+            NoResponseError:
+
+                If there was no response to an request made by this coroutine
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+            >>> from netaddr import EUI
+
+            Get the MAC address of a connected STU
+
+            >>> async def get_mac_address(icosystem: ICOsystem):
+            ...     await icosystem.connect_stu()
+            ...     mac_address = await icosystem.get_stu_mac_address()
+            ...     await icosystem.disconnect_stu()
+            ...     return mac_address
+            >>> mac_address = run(get_mac_address(ICOsystem()))
+            >>> isinstance(mac_address, EUI)
+            True
+
+            Trying to get the MAC address without an STU connection fails
+
+            >>> async def get_mac_address(icosystem: ICOsystem):
+            ...     await icosystem.get_stu_mac_address()
+            >>> run(get_mac_address(ICOsystem())
+            ...    ) # doctest:+NORMALIZE_WHITESPACE
+            Traceback (most recent call last):
+               ...
+            icostate.error.IncorrectStateError: Getting MAC address of STU not
+            allowed in the state: Disconnected
+
+        """
+
+        self._check_in_state(
+            {State.DISCONNECTED}, "Getting MAC address of STU", invert=True
+        )
+
+        assert isinstance(self.stu, STU)
+
+        return await self.stu.get_mac_address()
 
     async def reset_stu(self) -> None:
         """Reset STU
@@ -276,11 +340,11 @@ class ICOsystem(AsyncIOEventEmitter):
             Traceback (most recent call last):
                ...
             icostate.error.IncorrectStateError: Resetting STU only allowed in
-                the state: STU Connected (not in the state Disconnected)
+                the state: STU Connected (current state: Disconnected)
 
         """
 
-        self._check_state({State.STU_CONNECTED}, "Resetting STU")
+        self._check_in_state({State.STU_CONNECTED}, "Resetting STU")
 
         assert isinstance(self.stu, STU)
 
@@ -335,7 +399,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.STU_CONNECTED}, "Collecting data about sensor devices"
         )
 
@@ -401,7 +465,9 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state({State.STU_CONNECTED}, "Connecting to sensor device")
+        self._check_in_state(
+            {State.STU_CONNECTED}, "Connecting to sensor device"
+        )
 
         assert isinstance(self.stu, STU)
 
@@ -447,7 +513,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Disconnecting from sensor device"
         )
 
@@ -619,7 +685,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Renaming sensor device",
         )
@@ -723,7 +789,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Getting ADC configuration of sensor node",
         )
@@ -825,7 +891,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Setting ADC configuration of sensor node",
         )
@@ -865,7 +931,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_state(
+        self._check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Starting measurement"
         )
 
@@ -876,7 +942,7 @@ class ICOsystem(AsyncIOEventEmitter):
     async def stop_measurement(self) -> None:
         """Stop measurement"""
 
-        self._check_state({State.MEASUREMENT}, "Stopping measurement")
+        self._check_in_state({State.MEASUREMENT}, "Stopping measurement")
 
         self.measurement.stop()
 

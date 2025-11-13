@@ -7,3 +7,4 @@ from icotronic.can.error import CANInitError
 from icotronic.measurement import Conversion, MeasurementData
 
 from icostate.system import ICOsystem
+from icostate.state import State

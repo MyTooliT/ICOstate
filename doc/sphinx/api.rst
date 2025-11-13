@@ -10,6 +10,9 @@ System
 .. autoclass:: ICOsystem
    :members:
 
+.. autoclass:: State
+   :members:
+
 Measurement
 ###########
 

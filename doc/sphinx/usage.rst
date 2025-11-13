@@ -30,7 +30,10 @@ State Diagram
        measurement --> sensor_node_connected: stop_measurement
 
 
-In addition to coroutines that label the edges of the `state diagram <#state-diagram>`_ above you can also use the coroutine :meth:`ICOsystem.is_sensor_node_connected`, which works in any state.
+In addition to coroutines that label the edges of the `state diagram <#state-diagram>`_ above you can also:
+
+- Use the coroutine :meth:`ICOsystem.is_sensor_node_connected`, which works in any state.
+- Use the coroutine :meth:`ICOsystem.get_stu_mac_address`, which works in all states **except** :attr:`State.Disconnected`.
 
 STU
 ###

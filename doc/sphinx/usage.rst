@@ -20,7 +20,7 @@ State Diagram
        disconnected --> stu_connected: connect_stu
 
        stu_connected --> disconnected: disconnect_stu
-       stu_connected --> stu_connected: collect_sensor_nodes, get_adc_configuration, rename, reset, set_adc_configuration
+       stu_connected --> stu_connected: collect_sensor_nodes, get_adc_configuration, rename, reset_stu, set_adc_configuration
        stu_connected --> sensor_node_connected: connect_sensor_node_mac
 
        sensor_node_connected --> stu_connected: disconnect_sensor_node

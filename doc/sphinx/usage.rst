@@ -20,7 +20,7 @@ State Diagram
        disconnected --> stu_connected: connect_stu
 
        stu_connected --> disconnected: disconnect_stu
-       stu_connected --> stu_connected: collect_sensor_nodes, get_adc_configuration, rename, reset_stu, set_adc_configuration
+       stu_connected --> stu_connected: get_adc_configuration, rename, reset_stu, set_adc_configuration
        stu_connected --> sensor_node_connected: connect_sensor_node_mac
 
        sensor_node_connected --> stu_connected: disconnect_sensor_node
@@ -33,7 +33,13 @@ State Diagram
 In addition to coroutines that label the edges of the `state diagram <#state-diagram>`_ above you can also:
 
 - Use the coroutine :meth:`ICOsystem.is_sensor_node_connected`, which works in any state.
-- Use the coroutine :meth:`ICOsystem.get_stu_mac_address`, which works in all states **except** :attr:`State.Disconnected`.
+
+- Use the coroutines:
+
+  - :meth:`ICOsystem.get_stu_mac_address` or
+  - :meth:`ICOsystem.collect_sensor_nodes`.
+
+  which works in all states **except** :attr:`State.Disconnected`.
 
 STU
 ###

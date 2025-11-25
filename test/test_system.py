@@ -50,6 +50,17 @@ async def test_connect(sensor_node_mac_address, sensor_node_name):
 
 
 @mark.asyncio
+async def test_collect_sensor_nodes(connect_sensor_node):
+    """Test sensor node collection"""
+
+    icosystem = connect_sensor_node
+    sensor_nodes = await icosystem.collect_sensor_nodes()
+    # Since the system is connected to what might be the only sensor node,
+    # there might be no sensor nodes available, when we search for them
+    assert len(sensor_nodes) >= 0
+
+
+@mark.asyncio
 async def test_rename_disconnected(
     connect_stu, sensor_node_mac_address, sensor_node_name
 ):

@@ -400,7 +400,9 @@ class ICOsystem(AsyncIOEventEmitter):
         """
 
         self._check_in_state(
-            {State.STU_CONNECTED}, "Collecting data about sensor devices"
+            {State.DISCONNECTED},
+            "Collecting data about sensor devices",
+            invert=True,
         )
 
         assert isinstance(self.stu, STU)

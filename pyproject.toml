@@ -43,7 +43,7 @@ dev = [
   "sphinx_toggleprompt>=0.6.0",
 ]
 test = [
-  "pytest-asyncio>=1.0.0",
+  "anyio>=4.11",
   "pytest-rerunfailures>=16.1",
   "pytest-sphinx>=0.6.3",
   "pytest-sugar>=1.1.1",
@@ -82,9 +82,7 @@ check_untyped_defs = true
 [tool.pylint]
 ignore-paths = [ "^.venv.*$" ]
 
-[tool.pytest.ini_options]
-# - Use doctests
-# - Verbose output
-addopts = "--doctest-modules"
+[tool.pytest]
+addopts = ["--doctest-modules"]
 minversion = "6.0"
-asyncio_mode = "auto"
+anyio_mode = "auto"

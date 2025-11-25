@@ -18,7 +18,7 @@ from icostate.system import ICOsystem, State
 # -- Functions ----------------------------------------------------------------
 
 
-@mark.asyncio
+@mark.anyio
 async def test_connect(sensor_node_mac_address, sensor_node_name):
     """Test sensor connection"""
 
@@ -49,7 +49,7 @@ async def test_connect(sensor_node_mac_address, sensor_node_name):
     await icosystem.disconnect_stu()
 
 
-@mark.asyncio
+@mark.anyio
 async def test_collect_sensor_nodes(connect_sensor_node):
     """Test sensor node collection"""
 
@@ -60,7 +60,7 @@ async def test_collect_sensor_nodes(connect_sensor_node):
     assert len(sensor_nodes) >= 0
 
 
-@mark.asyncio
+@mark.anyio
 async def test_rename_disconnected(
     connect_stu, sensor_node_mac_address, sensor_node_name
 ):
@@ -98,7 +98,7 @@ async def test_rename_disconnected(
     assert current_sensor_name == sensor_node_name
 
 
-@mark.asyncio
+@mark.anyio
 async def test_adc_get(connect_sensor_node):
     """Test ADC get coroutine"""
 
@@ -116,7 +116,7 @@ async def test_adc_get(connect_sensor_node):
     assert adc_event_triggered is True
 
 
-@mark.asyncio
+@mark.anyio
 async def test_adc_set(connect_sensor_node):
     """Test ADC set coroutine"""
 
@@ -154,7 +154,7 @@ async def test_adc_set(connect_sensor_node):
     assert adc_config == default_adc_config
 
 
-@mark.asyncio
+@mark.anyio
 async def test_measurement(connect_sensor_node):
     """Test measurement coroutines"""
 

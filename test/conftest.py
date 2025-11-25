@@ -13,6 +13,13 @@ from icostate.system import ICOsystem
 
 
 @fixture(scope="session")
+def anyio_backend():
+    """Set default async backend"""
+
+    return "asyncio"
+
+
+@fixture(scope="session")
 def sensor_node_name():
     """Returns the name of the sensor node used for the test"""
 

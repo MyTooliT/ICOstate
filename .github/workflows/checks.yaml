@@ -36,11 +36,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dev and test packages
-      run: pip install -e .[dev,test]
-
-    - name: Check code base
-      run: make check
+    - name: Install just
+      uses: taiki-e/install-action@just
 
     - name: Test code
-      run: make test-no-hardware
+      run: just test-no-hardware

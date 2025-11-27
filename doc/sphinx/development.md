@@ -2,7 +2,7 @@
 
 While not strictly a necessity, we assume that you installed the following developer dependencies:
 
-- [Make](<https://en.wikipedia.org/wiki/Make_(software)>)
+- [just](https://just.systems/man/en)
 - [uv](https://docs.astral.sh/uv/)
 
 in the text below.
@@ -19,7 +19,7 @@ uv sync --all-extras
 ## Check
 
 ```sh
-make check
+just check
 ```
 
 ## Release
@@ -29,7 +29,7 @@ make check
 1. Make sure that all the checks and tests work correctly locally
 
    ```sh
-   make
+   just
    ```
 
 2. Make sure all [workflows of the CI system work correctly](https://github.com/MyTooliT/ICOstate/actions)

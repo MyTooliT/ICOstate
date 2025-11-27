@@ -84,5 +84,5 @@ ignore-paths = [ "^.venv.*$" ]
 
 [tool.pytest]
 addopts = ["--doctest-modules"]
-minversion = "6.0"
+minversion = "9.0"
 anyio_mode = "auto"

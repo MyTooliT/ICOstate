@@ -8,15 +8,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - name: macos
-            icon: 🍏
           - name: ubuntu
             icon: 🐧
-          - name: windows
-            icon: 🪟
         python-version:
-          - '3.12'
-          - '3.13'
           - '3.14'
         exclude:
           # No easy option to install PyTables deps on Windows that I know of

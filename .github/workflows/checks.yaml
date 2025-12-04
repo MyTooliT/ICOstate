@@ -62,7 +62,10 @@ jobs:
       if: ${{ runner.os == 'macOS' && matrix.python-version == '3.14' }}
       run: |
         brew install c-blosc2 bzip2 hdf5
-        echo "BLOSC_DIR2=/opt/homebrew/opt/c-blosc2" >> "$GITHUB_ENV"
+        mkdir -p "$PWD/.venv/lib/python3.14/site-packages/tables/"
+        ln -s \
+          "$(pkg-config blosc2 --variable sharedlibdir)"/libblosc2.dylib \
+          "$PWD/.venv/lib/python3.14/site-packages/tables/libblosc2.dylib"
 
     - name: Test code
       run: just test-no-hardware

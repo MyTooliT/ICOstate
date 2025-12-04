@@ -42,11 +42,7 @@ just check
    3. Push changes
 
    ```sh
-   uv version <VERSION>
-   export icostate_version="$(uv version --short)"
-   git commit -a -m "Release: Release version $icostate_version"
-   git tag "$icostate_version"
-   git push && git push --tags
+   just <VERSION>
    ```
 
 5. Open the [release notes](https://github.com/MyTooliT/ICOstate/tree/main/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)

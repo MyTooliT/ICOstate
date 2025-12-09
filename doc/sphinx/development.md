@@ -42,7 +42,7 @@ just check
    3. Push changes
 
    ```sh
-   just <VERSION>
+   just release <VERSION>
    ```
 
 5. Open the [release notes](https://github.com/MyTooliT/ICOstate/tree/main/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/ICOstate/releases/new)

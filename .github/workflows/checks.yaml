@@ -47,8 +47,10 @@ jobs:
 
     # We install PyTables dependencies, if we use Python 3.14 for testing, since
     # there is no binary package (wheel) available for the package yet.
+    # Unfortunately there seems to be a problem finding the Blosc library
+    # at runtime. As a workaround we add a link to the shared library file.
 
-    - name: Install PyTables dependencies on Linux
+    - name: Install PyTables dependencies on Linux (Python 3.14)
       if: ${{ runner.os == 'Linux' && matrix.python-version == '3.14' }}
       run: | # See also: https://github.com/PyTables/PyTables/issues/1262
         sudo apt install libhdf5-dev libblosc2-dev libbz2-dev liblzo2-dev
@@ -63,7 +65,7 @@ jobs:
         library_link="${LD_LIBRARY_PATH}/libblosc2.so.6"
         ln -s "${library_directory}/libblosc2.so" "${library_link}"
 
-    - name: Install PyTables dependencies on macOS
+    - name: Install PyTables dependencies on macOS (Python 3.14)
       if: ${{ runner.os == 'macOS' && matrix.python-version == '3.14' }}
       run: |
         brew install c-blosc2 bzip2 hdf5

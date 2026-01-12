@@ -614,7 +614,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
     async def rename(
         self, new_name: str, mac_address: str | None = None
-    ) -> None:
+    ) -> str:
         """Set the name of the sensor node with the specified MAC address
 
         Depending on the state the system is in this coroutine will **either**:
@@ -633,6 +633,10 @@ class ICOsystem(AsyncIOEventEmitter):
             mac_address:
 
                 The MAC address of the sensor device that should be renamed
+
+        Returns:
+
+            The (old) name before it was changed to ``new_name``
 
         Raises:
 
@@ -666,6 +670,27 @@ class ICOsystem(AsyncIOEventEmitter):
             Before renaming: STU Connected
             After renaming: STU Connected
 
+            The coroutine returns the old name of the sensor node
+
+            >>> async def rename_disconnected(icosystem: ICOsystem,
+            ...                               mac_address: str,
+            ...                               name: str):
+            ...     await icosystem.connect_stu()
+            ...     old_name = await icosystem.rename(name, mac_address)
+            ...     await icosystem.disconnect_stu()
+            ...     return old_name
+            >>> name = "Test-STH"
+            >>> new_name = "Test-RN"
+            >>> mac_address = (
+            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
+            >>> old = run(rename_disconnected(ICOsystem(), mac_address,
+            ...           new_name))
+            >>> old == name
+            True
+            >>> old = run(rename_disconnected(ICOsystem(), mac_address, name))
+            >>> old == new_name
+            True
+
             Rename a connected sensor node
 
             >>> async def rename_connected(icosystem: ICOsystem,
@@ -697,6 +722,7 @@ class ICOsystem(AsyncIOEventEmitter):
         # Sensor node attributes should have been set at least once by
         # calling `connect_sensor_node_mac` either directly or indirectly.
         assert isinstance(self.sensor_node_attributes, SensorNodeAttributes)
+        old_name = self.sensor_node_attributes.name
 
         await self.sensor_node.set_name(new_name)
         self.sensor_node_attributes.name = new_name
@@ -704,6 +730,8 @@ class ICOsystem(AsyncIOEventEmitter):
 
         if disconnect_after:
             await self.disconnect_sensor_node()
+
+        return old_name
 
     async def get_adc_configuration(
         self, mac_address: str | None = None

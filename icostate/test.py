@@ -1,3 +1,3 @@
 # -- Attributes ---------------------------------------------------------------
 
-test_sensor_node_eui = "94-DE-B8-ED-70-37"
+TEST_SENSOR_NODE_EUI = "94-DE-B8-ED-70-37"

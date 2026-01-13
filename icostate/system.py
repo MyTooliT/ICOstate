@@ -433,7 +433,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
-            >>> from icostate.test import test_sensor_node_eui
+            >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
             Connect to and disconnect from sensor node
 
@@ -445,7 +445,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_sensor_node()
             ...     print(icosystem.state)
             ...     await icosystem.disconnect_stu()
-            >>> run(connect_sensor_node(ICOsystem(), test_sensor_node_eui))
+            >>> run(connect_sensor_node(ICOsystem(), TEST_SENSOR_NODE_EUI))
             Sensor Node Connected
             STU Connected
 
@@ -541,7 +541,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
-            >>> from icostate.test import test_sensor_node_eui
+            >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
             Check if a sensor node is connected
 
@@ -559,7 +559,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     print("After disconnection from sensor node:",
             ...           await icosystem.is_sensor_node_connected())
             ...     await icosystem.disconnect_stu()
-            >>> run(connect_sensor_node(ICOsystem(), test_sensor_node_eui))
+            >>> run(connect_sensor_node(ICOsystem(), TEST_SENSOR_NODE_EUI))
             Before connection to STU: False
             After connection to STU: False
             After connection to sensor node: True
@@ -650,7 +650,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
-            >>> from icostate.test import test_sensor_node_eui
+            >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
             Rename a disconnected sensor node
 
@@ -664,7 +664,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_stu()
             >>> name = "Test-STH"
             >>> run(rename_disconnected(ICOsystem(),
-            ...                         test_sensor_node_eui, name))
+            ...                         TEST_SENSOR_NODE_EUI, name))
             Before renaming: STU Connected
             After renaming: STU Connected
 
@@ -680,11 +680,11 @@ class ICOsystem(AsyncIOEventEmitter):
             >>> name = "Test-STH"
             >>> new_name = "Test-RN"
             >>> old = run(rename_disconnected(ICOsystem(),
-            ...                               test_sensor_node_eui, new_name))
+            ...                               TEST_SENSOR_NODE_EUI, new_name))
             >>> old == name
             True
             >>> old = run(rename_disconnected(ICOsystem(),
-            ...                               test_sensor_node_eui, name))
+            ...                               TEST_SENSOR_NODE_EUI, name))
             >>> old == new_name
             True
 
@@ -701,7 +701,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
             >>> name = "Test-STH"
-            >>> run(rename_connected(ICOsystem(), test_sensor_node_eui, name))
+            >>> run(rename_connected(ICOsystem(), TEST_SENSOR_NODE_EUI, name))
             Before renaming: Sensor Node Connected
             After renaming: Sensor Node Connected
 
@@ -766,7 +766,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
-            >>> from icostate.test import test_sensor_node_eui
+            >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
             Read the ADC configuration of a disconnected sensor node
 
@@ -781,7 +781,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
             >>> config = run(get_adc_configuration(ICOsystem(),
-            ...                                    test_sensor_node_eui))
+            ...                                    TEST_SENSOR_NODE_EUI))
             Before reading ADC config: STU Connected
             After reading ADC config: STU Connected
             >>> isinstance(config.prescaler, int)
@@ -807,7 +807,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
             >>> config = run(get_adc_configuration(ICOsystem(),
-            ...                                    test_sensor_node_eui))
+            ...                                    TEST_SENSOR_NODE_EUI))
             >>> isinstance(config, ADCConfiguration)
             True
 
@@ -867,7 +867,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
-            >>> from icostate.test import test_sensor_node_eui
+            >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
             Set the ADC configuration of a disconnected sensor node
 
@@ -885,7 +885,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...                           acquisition_time=8,
             ...                           oversampling_rate=64)
             >>> config = run(set_adc_configuration(ICOsystem(), config,
-            ...                                    test_sensor_node_eui))
+            ...                                    TEST_SENSOR_NODE_EUI))
             Before setting ADC config: STU Connected
             After setting ADC config: STU Connected
 
@@ -906,7 +906,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...                           acquisition_time=8,
             ...                           oversampling_rate=64)
             >>> config = run(set_adc_configuration(ICOsystem(), config,
-            ...                                    test_sensor_node_eui))
+            ...                                    TEST_SENSOR_NODE_EUI))
             Before setting ADC config: Sensor Node Connected
             After setting ADC config: Sensor Node Connected
 

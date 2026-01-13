@@ -121,7 +121,7 @@ Before you start a measurement you need to connect to a sensor node. To do that 
 
    >>> from asyncio import run
    >>> from icostate import ICOsystem
-   >>> from icostate.test import test_sensor_node_eui
+   >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
    >>> async def connect_disconnect_sensor_node(icosystem: ICOsystem,
    ...                                          mac_address: str):
@@ -133,7 +133,7 @@ Before you start a measurement you need to connect to a sensor node. To do that 
    ...     print(f"Connected: {await icosystem.is_sensor_node_connected()}")
    ...     await icosystem.disconnect_stu()
 
-   >>> mac_address = test_sensor_node_eui # Change to MAC address of your sensor node
+   >>> mac_address = TEST_SENSOR_NODE_EUI # Change to MAC address of your sensor node
    >>> run(connect_disconnect_sensor_node(ICOsystem(), mac_address))
    Connected: False
    Connected: True
@@ -148,7 +148,7 @@ To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requir
 
    >>> from asyncio import run
    >>> from icostate import ICOsystem
-   >>> from icostate.test import test_sensor_node_eui
+   >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
    >>> async def rename_disconnected(icosystem: ICOsystem,
    ...                               mac_address: str,
@@ -159,7 +159,7 @@ To rename a sensor node use the coroutine :meth:`ICOsystem.rename`, which requir
    ...     print(f"State After: {icosystem.state}")
    ...     await icosystem.disconnect_stu()
 
-   >>> mac_address = test_sensor_node_eui # Change to MAC address of your sensor node
+   >>> mac_address = TEST_SENSOR_NODE_EUI # Change to MAC address of your sensor node
    >>> name = "Test-STH"
    >>> run(rename_disconnected(ICOsystem(), mac_address, name))
    State Before: STU Connected
@@ -183,7 +183,7 @@ The example below shows how you can react to changes of the sensor node name:
 
    >>> from asyncio import sleep, run
    >>> from icostate import ICOsystem
-   >>> from icostate.test import test_sensor_node_eui
+   >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
    >>> async def react_sensor_node_name(icosystem: ICOsystem, mac_address: str):
    ...
@@ -197,7 +197,7 @@ The example below shows how you can react to changes of the sensor node name:
    ...     await icosystem.disconnect_sensor_node()
    ...     await icosystem.disconnect_stu()
 
-   >>> mac_address = test_sensor_node_eui # Change to MAC address of your sensor node
+   >>> mac_address = TEST_SENSOR_NODE_EUI # Change to MAC address of your sensor node
    >>> run(react_sensor_node_name(ICOsystem(), mac_address))
    Name of sensor node: Test-STH
 
@@ -212,7 +212,7 @@ To start a measurement use the function `start_measurement` and provide a :class
    >>> from asyncio import run, sleep
    >>> from time import time
    >>> from icostate import ICOsystem, MeasurementData, StreamingConfiguration
-   >>> from icostate.test import test_sensor_node_eui
+   >>> from icostate.test import TEST_SENSOR_NODE_EUI
 
    >>> async def measure_data(icosystem: ICOsystem, mac_address: str) -> None:
    ...     await icosystem.connect_stu()
@@ -270,7 +270,7 @@ To start a measurement use the function `start_measurement` and provide a :class
    ...     await icosystem.disconnect_sensor_node()
    ...     await icosystem.disconnect_stu()
 
-   >>> mac_address = test_sensor_node_eui # Change to MAC address of your sensor node
+   >>> mac_address = TEST_SENSOR_NODE_EUI # Change to MAC address of your sensor node
    >>> run(measure_data(ICOsystem(), mac_address))
 
 For more information on how to work with measurement data, please take a look at the links below.

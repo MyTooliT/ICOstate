@@ -24,7 +24,7 @@ State Diagram
        stu_connected --> sensor_node_connected: connect_sensor_node_mac
 
        sensor_node_connected --> stu_connected: disconnect_sensor_node
-       sensor_node_connected --> sensor_node_connected: get_adc_configuration, rename, set_adc_configuration, set_sensor_configuration
+       sensor_node_connected --> sensor_node_connected: get_adc_configuration, get_sensor_configuration, rename, set_adc_configuration, set_sensor_configuration
        sensor_node_connected --> measurement: start_measurement
 
        measurement --> sensor_node_connected: stop_measurement

@@ -930,6 +930,46 @@ class ICOsystem(AsyncIOEventEmitter):
         if disconnect_after:
             await self.disconnect_sensor_node()
 
+    async def get_sensor_configuration(self) -> SensorConfiguration:
+        """Get the sensor numbers for the different measurement channels
+
+        Raises:
+
+            UnsupportedFeatureException: if the sensor node does not
+            support reading the sensor configuration
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+            >>> from icostate.config import settings
+
+            Getting sensor config for node (with support) works
+
+            >>> async def get_sensor_configuration(icosystem: ICOsystem,
+            ...                                    mac_address: str):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     config = await icosystem.get_sensor_configuration()
+            ...     await icosystem.disconnect_sensor_node()
+            ...     await icosystem.disconnect_stu()
+            ...     return config
+            >>> config = run(get_sensor_configuration(ICOsystem(),
+            ...                              settings.sensor_node.eui))
+            >>> [ 0 <= value <= 255 for value in config.values() ]
+            [True, True, True]
+
+        """
+
+        self._check_in_state(
+            {State.SENSOR_NODE_CONNECTED}, "Setting sensor configuration"
+        )
+
+        assert isinstance(self.sensor_node, SensorNode)
+
+        return await self.sensor_node.get_sensor_configuration()
+
     async def set_sensor_configuration(
         self, sensors: SensorConfiguration
     ) -> None:
@@ -953,7 +993,7 @@ class ICOsystem(AsyncIOEventEmitter):
             >>> from asyncio import run
             >>> from icostate.config import settings
 
-            Setting sensor config for node with support works
+            Setting sensor config for node (with support) works
 
             >>> async def set_sensor_configuration(icosystem: ICOsystem,
             ...                                    config: SensorConfiguration,
@@ -961,11 +1001,15 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.connect_stu()
             ...     await icosystem.connect_sensor_node_mac(mac_address)
             ...     await icosystem.set_sensor_configuration(config)
+            ...     config_read = await icosystem.get_sensor_configuration()
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
-            >>> config = SensorConfiguration(first=2, second=1, third=3)
-            >>> config = run(set_sensor_configuration(
-            ...                 ICOsystem(), config, settings.sensor_node.eui))
+            ...     return config_read
+            >>> config = SensorConfiguration(first=2, second=5, third=3)
+            >>> config_read = run(set_sensor_configuration(
+            ...     ICOsystem(), config, settings.sensor_node.eui))
+            >>> config == config_read
+            True
 
         """
 

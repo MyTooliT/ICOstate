@@ -433,6 +433,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
+            >>> from icostate.test import test_sensor_node_eui
 
             Connect to and disconnect from sensor node
 
@@ -444,9 +445,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_sensor_node()
             ...     print(icosystem.state)
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> run(connect_sensor_node(ICOsystem(), mac_address))
+            >>> run(connect_sensor_node(ICOsystem(), test_sensor_node_eui))
             Sensor Node Connected
             STU Connected
 
@@ -542,6 +541,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
+            >>> from icostate.test import test_sensor_node_eui
 
             Check if a sensor node is connected
 
@@ -559,9 +559,7 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     print("After disconnection from sensor node:",
             ...           await icosystem.is_sensor_node_connected())
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> run(connect_sensor_node(ICOsystem(), mac_address))
+            >>> run(connect_sensor_node(ICOsystem(), test_sensor_node_eui))
             Before connection to STU: False
             After connection to STU: False
             After connection to sensor node: True
@@ -652,6 +650,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
+            >>> from icostate.test import test_sensor_node_eui
 
             Rename a disconnected sensor node
 
@@ -663,10 +662,9 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.rename(name, mac_address)
             ...     print(f"After renaming: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
             >>> name = "Test-STH"
-            >>> run(rename_disconnected(ICOsystem(), mac_address, name))
+            >>> run(rename_disconnected(ICOsystem(),
+            ...                         test_sensor_node_eui, name))
             Before renaming: STU Connected
             After renaming: STU Connected
 
@@ -681,13 +679,12 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     return old_name
             >>> name = "Test-STH"
             >>> new_name = "Test-RN"
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> old = run(rename_disconnected(ICOsystem(), mac_address,
-            ...           new_name))
+            >>> old = run(rename_disconnected(ICOsystem(),
+            ...                               test_sensor_node_eui, new_name))
             >>> old == name
             True
-            >>> old = run(rename_disconnected(ICOsystem(), mac_address, name))
+            >>> old = run(rename_disconnected(ICOsystem(),
+            ...                               test_sensor_node_eui, name))
             >>> old == new_name
             True
 
@@ -703,10 +700,8 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     print(f"After renaming: {icosystem.state}")
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
             >>> name = "Test-STH"
-            >>> run(rename_connected(ICOsystem(), mac_address, name))
+            >>> run(rename_connected(ICOsystem(), test_sensor_node_eui, name))
             Before renaming: Sensor Node Connected
             After renaming: Sensor Node Connected
 
@@ -771,6 +766,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
+            >>> from icostate.test import test_sensor_node_eui
 
             Read the ADC configuration of a disconnected sensor node
 
@@ -784,9 +780,8 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     print(f"After reading ADC config: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> config = run(get_adc_configuration(ICOsystem(), mac_address))
+            >>> config = run(get_adc_configuration(ICOsystem(),
+            ...                                    test_sensor_node_eui))
             Before reading ADC config: STU Connected
             After reading ADC config: STU Connected
             >>> isinstance(config.prescaler, int)
@@ -811,9 +806,8 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
             ...     return adc_config
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
-            >>> config = run(get_adc_configuration(ICOsystem(), mac_address))
+            >>> config = run(get_adc_configuration(ICOsystem(),
+            ...                                    test_sensor_node_eui))
             >>> isinstance(config, ADCConfiguration)
             True
 
@@ -873,6 +867,7 @@ class ICOsystem(AsyncIOEventEmitter):
             Import necessary code
 
             >>> from asyncio import run
+            >>> from icostate.test import test_sensor_node_eui
 
             Set the ADC configuration of a disconnected sensor node
 
@@ -886,13 +881,11 @@ class ICOsystem(AsyncIOEventEmitter):
             ...                                         mac_address))
             ...     print(f"After setting ADC config: {icosystem.state}")
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
             >>> config = ADCConfiguration(prescaler=2,
             ...                           acquisition_time=8,
             ...                           oversampling_rate=64)
             >>> config = run(set_adc_configuration(ICOsystem(), config,
-            ...                                    mac_address))
+            ...                                    test_sensor_node_eui))
             Before setting ADC config: STU Connected
             After setting ADC config: STU Connected
 
@@ -909,13 +902,11 @@ class ICOsystem(AsyncIOEventEmitter):
             ...     print(f"After setting ADC config: {icosystem.state}")
             ...     await icosystem.disconnect_sensor_node()
             ...     await icosystem.disconnect_stu()
-            >>> mac_address = (
-            ...     "08-6B-D7-01-DE-81") # Change to MAC address of your node
             >>> config = ADCConfiguration(prescaler=2,
             ...                           acquisition_time=8,
             ...                           oversampling_rate=64)
             >>> config = run(set_adc_configuration(ICOsystem(), config,
-            ...                                    mac_address))
+            ...                                    test_sensor_node_eui))
             Before setting ADC config: Sensor Node Connected
             After setting ADC config: Sensor Node Connected
 

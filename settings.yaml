@@ -1,0 +1,5 @@
+sensor node:
+  # MAC address of sensor node used for testing
+  # You can overwrite this value using the environment variable
+  # `DYNACONF_SENSOR_NODE__EUI`
+  EUI:  94-DE-B8-ED-70-37

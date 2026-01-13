@@ -1,5 +1,7 @@
 """Application Programming Interface for stateful access to ICOtronic system"""
 
+# pylint: disable=too-many-lines
+
 # -- Imports ------------------------------------------------------------------
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ from typing import Any
 from icotronic.can import Connection, SensorNode, StreamingConfiguration, STU
 from icotronic.can.adc import ADCConfiguration
 from icotronic.can.node.stu import AsyncSensorNodeManager, SensorNodeInfo
+from icotronic.can.sensor import SensorConfiguration
 from icotronic.can.status import State as NodeState
 from icotronic.measurement import MeasurementData
 from netaddr import AddrFormatError, EUI
@@ -926,6 +929,53 @@ class ICOsystem(AsyncIOEventEmitter):
 
         if disconnect_after:
             await self.disconnect_sensor_node()
+
+    async def set_sensor_configuration(
+        self, sensors: SensorConfiguration
+    ) -> None:
+        """Change the sensor numbers for the different measurement channels
+
+        Args:
+
+            sensors:
+
+                The sensor numbers for the different measurement channels
+
+        Raises:
+
+            UnsupportedFeatureException: if the sensor node does not
+            support changing the sensor configuration
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+            >>> from icostate.config import settings
+
+            Setting sensor config for node with support works
+
+            >>> async def set_sensor_configuration(icosystem: ICOsystem,
+            ...                                    config: SensorConfiguration,
+            ...                                    mac_address: str):
+            ...     await icosystem.connect_stu()
+            ...     await icosystem.connect_sensor_node_mac(mac_address)
+            ...     await icosystem.set_sensor_configuration(config)
+            ...     await icosystem.disconnect_sensor_node()
+            ...     await icosystem.disconnect_stu()
+            >>> config = SensorConfiguration(first=2, second=1, third=3)
+            >>> config = run(set_sensor_configuration(
+            ...                 ICOsystem(), config, settings.sensor_node.eui))
+
+        """
+
+        self._check_in_state(
+            {State.SENSOR_NODE_CONNECTED}, "Setting sensor configuration"
+        )
+
+        assert isinstance(self.sensor_node, SensorNode)
+
+        await self.sensor_node.set_sensor_configuration(sensors)
 
     async def start_measurement(
         self,

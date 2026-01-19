@@ -164,7 +164,7 @@ class ICOsystem(AsyncIOEventEmitter):
         self.sensor_node_attributes: SensorNodeAttributes | None = None
         """Information about currently connected sensor node"""
 
-    def _check_in_state(
+    def check_in_state(
         self, states: set[State], description: str, invert=False
     ) -> None:
         """Check if the system is in an allowed state
@@ -188,6 +188,28 @@ class ICOsystem(AsyncIOEventEmitter):
             IncorrectStateError:
 
                 If the current state is not included in ``states``
+
+        Examples:
+
+            Import necessary code
+
+            >>> from asyncio import run
+            >>> from icostate.state import State
+
+            Checking for correct state will not raise an exception
+
+            >>> system = ICOsystem()
+            >>> system.check_in_state({State.DISCONNECTED},
+            ...                       "Doing something")
+
+            Checking for an incorrect state will raise an exception
+
+            >>> system.check_in_state({State.STU_CONNECTED},
+            ...     "Doing something") # doctest:+NORMALIZE_WHITESPACE
+            Traceback (most recent call last):
+               ...
+            icostate.error.IncorrectStateError: Doing something only allowed
+            in the state: STU Connected (current state: Disconnected)
 
         """
 
@@ -238,7 +260,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state({State.DISCONNECTED}, "Connecting to STU")
+        self.check_in_state({State.DISCONNECTED}, "Connecting to STU")
 
         # pylint: disable=unnecessary-dunder-call
         self.stu = await self.connection.__aenter__()
@@ -257,7 +279,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state({State.STU_CONNECTED}, "Disconnecting from STU")
+        self.check_in_state({State.STU_CONNECTED}, "Disconnecting from STU")
 
         await self.connection.__aexit__(None, None, None)
         self.state = State.DISCONNECTED
@@ -303,7 +325,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.DISCONNECTED}, "Getting MAC address of STU", invert=True
         )
 
@@ -347,7 +369,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state({State.STU_CONNECTED}, "Resetting STU")
+        self.check_in_state({State.STU_CONNECTED}, "Resetting STU")
 
         assert isinstance(self.stu, STU)
 
@@ -402,7 +424,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.DISCONNECTED},
             "Collecting data about sensor devices",
             invert=True,
@@ -469,7 +491,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.STU_CONNECTED}, "Connecting to sensor device"
         )
 
@@ -517,7 +539,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Disconnecting from sensor device"
         )
 
@@ -712,7 +734,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Renaming sensor device",
         )
@@ -818,7 +840,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Getting ADC configuration of sensor node",
         )
@@ -917,7 +939,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.STU_CONNECTED, State.SENSOR_NODE_CONNECTED},
             "Setting ADC configuration of sensor node",
         )
@@ -962,7 +984,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Setting sensor configuration"
         )
 
@@ -1013,7 +1035,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Setting sensor configuration"
         )
 
@@ -1048,7 +1070,7 @@ class ICOsystem(AsyncIOEventEmitter):
 
         """
 
-        self._check_in_state(
+        self.check_in_state(
             {State.SENSOR_NODE_CONNECTED}, "Starting measurement"
         )
 
@@ -1059,7 +1081,7 @@ class ICOsystem(AsyncIOEventEmitter):
     async def stop_measurement(self) -> None:
         """Stop measurement"""
 
-        self._check_in_state({State.MEASUREMENT}, "Stopping measurement")
+        self.check_in_state({State.MEASUREMENT}, "Stopping measurement")
 
         self.measurement.stop()
 

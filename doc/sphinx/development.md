@@ -22,6 +22,25 @@ uv sync --all-extras
 just check
 ```
 
+## Test
+
+### Preparation
+
+- Please make sure that you sensor node has the name `Test-STH`
+- Set the environment variable `DYNACONF_SENSOR_NODE__EUI` to the MAC address of your sensor node. You can find this address using the command:
+
+  ```sh
+  uv run icon list
+  ```
+
+### Running
+
+To run the tests, please use the following command:
+
+```sh
+just test
+```
+
 ## Release
 
 **Note:** In the text below we assume that you want to release version `<VERSION>` of the package. Please just replace this version number with the version that you want to release (e.g. `0.2`).

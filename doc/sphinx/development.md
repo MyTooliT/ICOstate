@@ -33,6 +33,14 @@ just check
   uv run icon list
   ```
 
+  If there is only a single node with the name `Test-STH` you can use the following [nu](https://www.nushell.sh/) shell command to set the environment variable:
+
+  ```sh
+  $env.DYNACONF_SENSOR_NODE__EUI = (uv run icon list |
+                                    grep Test-STH |
+                                    sed -E 's/.*MAC Address: ([0-9A-F-]+).*/\1/')
+  ```
+
 ### Running
 
 To run the tests, please use the following command:

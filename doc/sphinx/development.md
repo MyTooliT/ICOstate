@@ -41,6 +41,8 @@ just check
                                     sed -E 's/.*MAC Address: ([0-9A-F-]+).*/\1/')
   ```
 
+- The tests will fail if you use **recent sensor nodes with firmware 4.x or later** for running the tests, since they **report their own MAC address incorrectly**.
+
 ### Running
 
 To run the tests, please use the following command:

@@ -85,3 +85,17 @@ release version:
 documentation: setup
 	uv run sphinx-apidoc -f -o {{sphinx_directory}} {{sphinx_input_directory}}
 	uv run sphinx-build -M html {{sphinx_input_directory}} {{sphinx_directory}}
+
+# Remove documentation
+[group('documentation')]
+[windows]
+clean:
+	#!pwsh
+	Remove-Item -Recurse {{sphinx_directory}}
+
+# Remove documentation
+[group('documentation')]
+[unix]
+clean:
+	#!/usr/bin/env sh -e
+	rm -rf {{sphinx_directory}}

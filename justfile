@@ -82,6 +82,6 @@ release version:
 
 # Generate documentation
 [group('documentation')]
-documentation:
+documentation: setup
 	uv run sphinx-apidoc -f -o {{sphinx_directory}} {{sphinx_input_directory}}
 	uv run sphinx-build -M html {{sphinx_input_directory}} {{sphinx_directory}}
